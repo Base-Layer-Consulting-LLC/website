@@ -1,0 +1,90 @@
+---
+import { PhEnvelope } from "phosphor-icons-astro";
+
+import { site } from "../../config/site";
+---
+
+<!-- Floating Button -->
+<button
+  id="contact-fab"
+  class="fixed bottom-20 right-6 z-9999 flex items-center justify-center
+  w-14 h-14 rounded-full bg-primary text-primary-content
+  shadow-lg hover:scale-105 transition"
+  aria-label="Contact"
+>
+  <PhEnvelope class="w-7 h-7 text-white" weight="regular" />
+</button>
+
+<!-- Modal Overlay -->
+<div
+  id="contact-modal"
+  class="fixed inset-0 z-9999 hidden items-center justify-center bg-black/60 px-4"
+>
+  <!-- Modal Box -->
+  <div class="bg-base-100 w-full max-w-lg rounded-xl shadow-xl p-6 relative">
+    <!-- Close button -->
+    <button
+      id="contact-close"
+      class="absolute top-3 right-3 text-xl opacity-60 hover:opacity-100"
+      aria-label="Close"
+    >
+      ✕
+    </button>
+
+    <!-- Form -->
+    <form
+      action={`https://formspree.io/f/${site.formspreeContactFormId}`}
+      method="POST"
+      class="space-y-4"
+    >
+      <h2 class="text-xl font-semibold">Send a message</h2>
+
+      <input
+        type="email"
+        name="email"
+        placeholder="Your email"
+        required
+        class="input input-bordered w-full"
+      />
+
+      <input
+        type="tel"
+        name="phone"
+        placeholder="Your phone number (optional)"
+        class="input input-bordered w-full"
+      />
+
+      <textarea
+        name="message"
+        placeholder="Your message"
+        required
+        class="textarea textarea-bordered w-full"
+        rows="5"></textarea>
+
+      <button class="btn btn-primary w-full" type="submit"> Send </button>
+    </form>
+  </div>
+</div>
+
+<!-- Behavior -->
+<script is:inline>
+  const fab = document.getElementById("contact-fab");
+  const modal = document.getElementById("contact-modal");
+  const closeBtn = document.getElementById("contact-close");
+
+  fab?.addEventListener("click", () => {
+    modal?.classList.remove("hidden");
+    modal?.classList.add("flex");
+  });
+
+  const closeModal = () => {
+    modal?.classList.add("hidden");
+    modal?.classList.remove("flex");
+  };
+
+  closeBtn?.addEventListener("click", closeModal);
+
+  modal?.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
+  });
+</script>
