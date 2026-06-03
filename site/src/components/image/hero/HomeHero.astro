@@ -11,28 +11,47 @@ const { imgSrc, imgAlt = "" } = Astro.props;
 ---
 
 <section class="relative w-[94vw] mx-auto overflow-hidden">
-  <!-- Hero sizing frame -->
-  <div class="relative">
-    <!-- Background image -->
-    {
-      imgSrc && (
-        <div class="aspect-video sm:aspect-21/9 lg:aspect-auto lg:h-[48vh] lg:max-h-130">
-          <Image
-            src={imgSrc}
-            alt={imgAlt}
-            class="w-full h-full object-cover"
-            loading="eager"
-          />
-        </div>
-      )
-    }
+  <!-- Background image -->
+  {
+    imgSrc && (
+      <div class="h-[45vh] sm:h-[38vh] lg:h-[45vh]">
+        <Image
+          src={imgSrc}
+          alt={imgAlt}
+          class="w-full h-full rounded-lg object-cover"
+        />
+      </div>
+    )
+  }
 
-    <!-- Darken image -->
-    {imgSrc && <div class="absolute inset-0 bg-black/40" />}
+  <!-- Dim overlay -->
+  {imgSrc && <div class="absolute inset-0 bg-black/40" />}
 
-    <!-- Slot overlay -->
-    <div class="absolute inset-0 z-10 flex items-center justify-center">
-      <slot />
+  <!-- Overlay content -->
+  <div class="absolute inset-0 z-10 flex items-center justify-center px-6">
+    <div class="text-center text-white space-y-6 max-w-2xl w-full">
+      <!-- Logo & business name -->
+      <div class="flex items-center justify-center gap-3">
+        <slot name="brand" />
+      </div>
+
+      <!-- Tagline -->
+      {
+        Astro.slots.has("tagline") && (
+          <div class="text-lg sm:text-xl opacity-90">
+            <slot name="tagline" />
+          </div>
+        )
+      }
+
+      <!-- Info Card -->
+      {
+        Astro.slots.has("card") && (
+          <div class="bg-info-content/70 text-content rounded-xl p-5 shadow-lg text-sm space-y-2">
+            <slot name="card" />
+          </div>
+        )
+      }
     </div>
   </div>
 </section>

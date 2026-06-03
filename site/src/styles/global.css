@@ -2,7 +2,8 @@
 
 /* Tailwind v4-style plugin config for daisyUI */
 @plugin "daisyui" {
-    themes: light --default, dark --prefersdark;
+    /* Default: themes: light --default, dark --prefersdark; */
+    themes: light --default, sunset --prefersdark;
     logs: false;
 }
 
