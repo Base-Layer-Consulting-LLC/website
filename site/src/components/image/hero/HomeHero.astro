@@ -47,7 +47,7 @@ const { imgSrc, imgAlt = "" } = Astro.props;
       <!-- Info Card -->
       {
         Astro.slots.has("card") && (
-          <div class="bg-info-content/70 text-content rounded-xl p-5 shadow-lg text-sm space-y-2">
+          <div class="bg-neutral-content/70 text-black rounded-xl p-5 shadow-lg text-sm space-y-2">
             <slot name="card" />
           </div>
         )
