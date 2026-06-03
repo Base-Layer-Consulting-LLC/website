@@ -8,9 +8,10 @@ import LogoTransparent from "../components/image/logo/LogoTransparent.astro";
 
 import HomeHero from "../components/image/hero/HomeHero.astro";
 import heroImage from "../assets/img/hero-network-points.jpg";
+import { site } from "../config/site";
 ---
 
-<BaseLayout title="Home">
+<BaseLayout title={site.nameShort}>
   <div class="w-[94vw] mx-auto">
     <!-- <HomeHero imgSrc={heroImage} imgAlt="">
       <LogoTransparent />
@@ -26,17 +27,17 @@ import heroImage from "../assets/img/hero-network-points.jpg";
           <LogoTransparent class="h-10 w-10 lg:h-12 lg:w-12" />
 
           <h1 class="text-xl sm:text-2xl lg:text-4xl font-semibold text-white">
-            Base Layer Consulting LLC
+            {site.name}
           </h1>
         </div>
       </div>
 
       <div slot="tagline">
-        Core infrastructure and DevOps consulting for your business.
+        {site.tagline}
       </div>
 
       <div slot="card">
-        <p><strong>Email:</strong> jack@base-layer.llc</p>
+        <p><strong>Email:</strong> {site.emailMain}</p>
         <p><strong>Use for:</strong> General inquiries</p>
         <p><strong>Response time:</strong> 3-5 business days</p>
       </div>

@@ -13,6 +13,8 @@ const links = navLinks
 const pathname = Astro.url.pathname;
 const isActiveLink = (href: string) =>
   href === "/" ? pathname === "/" : pathname.startsWith(href);
+
+import { site } from "../../config/site";
 ---
 
 <div
@@ -47,7 +49,7 @@ const isActiveLink = (href: string) =>
       <NavLogo size={24} />
 
       <span class="font-semibold text-lg whitespace-nowrap">
-        Base Layer Consulting LLC
+        {site.name}
       </span>
     </a>
   </div>
@@ -60,7 +62,7 @@ const isActiveLink = (href: string) =>
       <NavLogo size={24} />
 
       <span class="font-semibold text-sm whitespace-nowrap">
-        Base Layer Consulting LLC
+        {site.name}
       </span>
     </a>
   </div>
