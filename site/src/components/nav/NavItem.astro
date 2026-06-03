@@ -1,0 +1,71 @@
+---
+//
+// NavItem allows formatting NavLink objects in different ways, i.e. dropdowns.
+//
+
+import NavLink from "./NavLink.astro";
+
+type NavItemData = {
+  href?: string;
+  label: string;
+  enabled?: boolean;
+  external?: boolean;
+  blank?: boolean;
+  order?: number;
+  dropdownHover?: boolean;
+  children?: NavItemData[];
+};
+
+type Props = {
+  link: NavItemData;
+  pathname: string;
+};
+
+const { link, pathname } = Astro.props as Props;
+
+const isActiveLink = (href?: string) =>
+  !!href && (href === "/" ? pathname === "/" : pathname.startsWith(href));
+
+const visibleChildren = (link.children ?? [])
+  .filter((child) => child.enabled !== false)
+  .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+const hasChildren = visibleChildren.length > 0;
+const isParentActive = isActiveLink(link.href);
+---
+
+{
+  hasChildren ? (
+    <li class="dropdown">
+      <details class={link.dropdownHover ? "dropdown-hover" : ""}>
+        <summary
+          class:list={[
+            "rounded-lg px-3 py-2 text-base font-medium transition",
+            "hover:bg-accent hover:text-accent-content",
+            isParentActive
+              ? "bg-accent text-accent-content font-bold"
+              : "text-base-content",
+          ]}
+        >
+          {link.label}
+        </summary>
+
+        <ul class="dropdown-content menu bg-base-100 rounded-box z-9999 mt-2 w-52 p-2 shadow-lg border border-base-200">
+          {visibleChildren.map((child) => (
+            <NavLink
+              href={child.href ?? "#"}
+              label={child.label}
+              active={isActiveLink(child.href)}
+            />
+          ))}
+        </ul>
+      </details>
+    </li>
+  ) : (
+    <NavLink
+      href={link.href ?? "#"}
+      label={link.label}
+      active={isActiveLink(link.href)}
+    />
+  )
+}

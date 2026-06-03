@@ -1,0 +1,20 @@
+---
+import { Image } from "astro:assets";
+import brandLogo from "../../../assets/img/brand/logo/base-layer-logo-square-no-text-transparent.png";
+
+interface Props {
+  size?: number;
+  alt?: string;
+  class?: string;
+}
+
+const { class: className = "", alt = "Base Layer Consulting logo" } =
+  Astro.props;
+---
+
+<Image
+  src={brandLogo}
+  alt={alt}
+  class={`block h-8 w-8 sm:h-10 sm:w-10 lg:h-24 lg:w-24 ${className}`.trim()}
+  loading="eager"
+/>

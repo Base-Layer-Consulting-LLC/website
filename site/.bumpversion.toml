@@ -1,0 +1,12 @@
+[tool.bumpversion]
+current_version = "0.1.0"
+## Commit & tag handled by pipeline
+commit = false
+tag = false
+tag_name = "v{new_version}"
+allow_dirty = false
+
+[[tool.bumpversion.files]]
+filename = "VERSION"
+search = "{current_version}"
+replace = "{new_version}"

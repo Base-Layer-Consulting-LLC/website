@@ -1,0 +1,38 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  imgSrc?: ImageMetadata;
+  imgAlt?: string;
+}
+
+const { imgSrc, imgAlt = "" } = Astro.props;
+---
+
+<section class="relative w-[94vw] mx-auto overflow-hidden">
+  <!-- Hero sizing frame -->
+  <div class="relative">
+    <!-- Background image -->
+    {
+      imgSrc && (
+        <div class="aspect-video sm:aspect-21/9 lg:aspect-auto lg:h-[48vh] lg:max-h-130">
+          <Image
+            src={imgSrc}
+            alt={imgAlt}
+            class="w-full h-full object-cover"
+            loading="eager"
+          />
+        </div>
+      )
+    }
+
+    <!-- Darken image -->
+    {imgSrc && <div class="absolute inset-0 bg-black/40" />}
+
+    <!-- Slot overlay -->
+    <div class="absolute inset-0 z-10 flex items-center justify-center">
+      <slot />
+    </div>
+  </div>
+</section>

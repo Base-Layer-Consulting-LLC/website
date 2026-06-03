@@ -1,0 +1,84 @@
+---
+import NavbarMenuButton from "./NavbarMenuButton.astro";
+// import SiteLogo from "../SiteLogo.astro";
+import NavLink from "./NavLink.astro";
+import { navLinks } from "../../data/navLinks";
+import NavLogo from "./NavLogo.astro";
+
+// Filter & sort links based on properties
+const links = navLinks
+  .filter((link) => link.enabled !== false)
+  .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+const pathname = Astro.url.pathname;
+const isActiveLink = (href: string) =>
+  href === "/" ? pathname === "/" : pathname.startsWith(href);
+---
+
+<div
+  class="navbar bg-base-100 shadow-md border-b border-base-300 top-0 z-50 relative"
+>
+  <!-- Left side -->
+  <div class="navbar-start">
+    <div class="dropdown">
+      <NavbarMenuButton />
+
+      <ul
+        tabindex="-1"
+        class="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow-lg border border-base-200"
+      >
+        {
+          links.map((link) => (
+            <NavLink
+              href={link.href}
+              label={link.label}
+              active={isActiveLink(link.href)}
+            />
+          ))
+        }
+      </ul>
+    </div>
+
+    <!-- Desktop logo -->
+    <a
+      href="/"
+      class="hidden lg:flex items-center gap-2 px-3 py-2 rounded-lg no-underline transition hover:bg-base-200"
+    >
+      <NavLogo size={24} />
+
+      <span class="font-semibold text-lg whitespace-nowrap">
+        Base Layer Consulting LLC
+      </span>
+    </a>
+  </div>
+
+  <!-- Mobile centered logo -->
+  <div
+    class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 lg:hidden"
+  >
+    <a href="/" class="flex items-center gap-2 no-underline">
+      <NavLogo size={24} />
+
+      <span class="font-semibold text-sm whitespace-nowrap">
+        Base Layer Consulting LLC
+      </span>
+    </a>
+  </div>
+
+  <!-- Desktop nav links -->
+  <div class="navbar-center hidden lg:flex">
+    <ul class="menu menu-horizontal px-1">
+      {
+        links.map((link) => (
+          <NavLink
+            href={link.href}
+            label={link.label}
+            active={isActiveLink(link.href)}
+          />
+        ))
+      }
+    </ul>
+  </div>
+
+  <div class="navbar-end"></div>
+</div>

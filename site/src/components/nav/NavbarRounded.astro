@@ -1,0 +1,71 @@
+---
+import NavbarMenuButton from "./NavbarMenuButton.astro";
+// import SiteLogo from "../SiteLogo.astro";
+import NavItem from "./NavItem.astro";
+import { navLinks } from "../../data/navLinks";
+
+// Filter & sort links based on properties
+const links = navLinks
+  .filter((link) => link.enabled !== false)
+  .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+---
+
+<div class="flex justify-center pt-4 sticky top-0 z-50">
+  <div
+    class="navbar bg-base-100 text-neutral-content shadow-lg rounded-full px-8 mx-8 max-w-8xl overflow-visible"
+    style="max-height: 4rem;"
+  >
+    <div class="navbar-start overflow-visible">
+      <div class="dropdown inline-block overflow-visible">
+        <NavbarMenuButton />
+
+        <ul
+          tabindex="-1"
+          class="menu menu-sm dropdown-content bg-base-100 rounded-box z-9999 mt-3 w-52 p-2 shadow-lg border border-base-200"
+        >
+          {
+            links.map((link) => (
+              <NavItem link={link} pathname={Astro.url.pathname} />
+            ))
+          }
+        </ul>
+      </div>
+
+      <a
+        class="flex items-center gap-2 px-2 py-2 rounded-lg no-underline transition hover:bg-base-200/50"
+        href="/"
+      >
+        <span class="font-semibold text-lg text-base-content hidden sm:block">
+          Base Layer LLC
+        </span>
+      </a>
+    </div>
+
+    <div class="navbar-center hidden lg:flex overflow-visible">
+      <ul class="menu menu-horizontal px-1 overflow-visible">
+        {
+          links.map((link) => (
+            <NavItem link={link} pathname={Astro.url.pathname} />
+          ))
+        }
+      </ul>
+    </div>
+
+    <!-- Right side -->
+    <div class="navbar-end"></div>
+  </div>
+
+  <!-- Dropdown menu js -->
+  <script>
+    document.addEventListener("click", (e) => {
+      const target = e.target;
+      if (!(target instanceof Node)) return;
+
+      document
+        .querySelectorAll("details.dropdown[open]")
+        .forEach((dropdown) => {
+          if (!dropdown.contains(target)) dropdown.removeAttribute("open");
+        });
+    });
+  </script>
+</div>

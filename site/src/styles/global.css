@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+/* Tailwind v4-style plugin config for daisyUI */
+@plugin "daisyui" {
+    themes: light --default, dark --prefersdark;
+    logs: false;
+}
+
+/* Global base styles */
+@layer base {
+    html {
+        @apply scroll-smooth;
+    }
+
+    body {
+        @apply antialiased bg-base-100 text-base-content;
+    }
+}
+
+/* Simple layout helpers */
+@layer utilities {
+    .page-shell {
+        @apply min-h-screen flex flex-col;
+    }
+
+    .page-main {
+        @apply flex-1 py-8;
+    }
+
+    .page-container {
+        @apply max-w-5xl mx-auto px-4;
+    }
+
+    .text-balance {
+        text-wrap: balance;
+    }
+}
+
+/* Custom CSS */

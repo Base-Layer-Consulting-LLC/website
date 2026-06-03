@@ -1,0 +1,23 @@
+---
+type Props = {
+  href: string;
+  label: string;
+  active?: boolean;
+};
+
+const { href, label, active = false } = Astro.props as Props;
+---
+
+<li>
+  <a
+    href={href}
+    class:list={[
+      "rounded-lg px-3 py-2 text-base font-medium transition",
+      "hover:bg-accent hover:text-accent-content",
+      active ? "bg-accent text-accent-content font-bold" : "text-base-content",
+    ]}
+    aria-current={active ? "page" : undefined}
+  >
+    {label}
+  </a>
+</li>

@@ -1,0 +1,35 @@
+---
+import "../styles/global.css";
+import Navbar from "../components/nav/Navbar.astro";
+import Footer from "../components/footer/Footer.astro";
+import Favicon from "../components/image/favicon/Favicon.astro";
+
+interface Props {
+  title?: string;
+}
+
+const { title = "Base Layer Consulting LLC" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{title}</title>
+
+    <Favicon />
+  </head>
+
+  <body class="page-shell">
+    <!-- <Navbar /> -->
+
+    <main class="page-main">
+      <div>
+        <slot />
+      </div>
+    </main>
+
+    <Footer />
+  </body>
+</html>

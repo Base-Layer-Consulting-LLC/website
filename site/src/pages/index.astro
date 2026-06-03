@@ -1,0 +1,25 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import HelloWorld from "../components/demo/HelloWorld.astro";
+import ExButton from "../components/demo/ExButton.astro";
+import ExCard from "../components/demo/ExCard.astro";
+import ExIconHouse from "../components/demo/ExIconHouse.astro";
+import LogoTransparent from "../components/image/logo/LogoTransparent.astro";
+
+import HomeHero from "../components/image/hero/HomeHero.astro";
+import heroImage from "../assets/img/hero-network-points.jpg";
+---
+
+<BaseLayout title="Home">
+  <div class="w-[94vw] mx-auto">
+    <!-- <div class="h-[45vh] sm:h-[55vh] lg:h-[60vh]"> -->
+    <HomeHero imgSrc={heroImage} imgAlt="">
+      <LogoTransparent />
+
+      <h1 class="text-3xl px-2 sm:text-4xl lg:text-6xl font-semibold">
+        Base Layer Consulting LLC
+      </h1>
+    </HomeHero>
+    <!-- </div> -->
+  </div>
+</BaseLayout>
