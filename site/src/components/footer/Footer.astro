@@ -1,5 +1,7 @@
 ---
 const year = new Date().getFullYear();
+
+import { site } from "../../config/site";
 ---
 
 <footer class="bg-base-200 border-t w-full">
@@ -7,7 +9,8 @@ const year = new Date().getFullYear();
     class="w-[94vw] mx-auto py-4 text-sm flex flex-col md:flex-row items-center justify-between gap-2"
   >
     <p class="opacity-70 md:text-left text-center md:flex-1">
-      © {year} Base Layer Consulting LLC
+      © {year}
+      {site.name}
     </p>
 
     <p class="opacity-70 md:text-center text-center md:flex-none">
@@ -15,7 +18,7 @@ const year = new Date().getFullYear();
     </p>
 
     <p class="opacity-70 text-right whitespace-nowrap md:flex-1">
-      jack@base-layer.llc
+      {site.emailMain}
     </p>
   </div>
 </footer>
