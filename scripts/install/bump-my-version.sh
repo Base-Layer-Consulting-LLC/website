@@ -10,13 +10,17 @@ if has_cmd bump-my-version; then
   exit 0
 fi
 
+echo "Installing bump-my-version"
+
 py=""
 if py="$(python_bin 2>/dev/null)"; then
   :
 else
-  install_cmd python3 || install_cmd python
+  install_python
   py="$(python_bin)"
 fi
 
 "$py" -m pip install --user --upgrade pip
 "$py" -m pip install --user bump-my-version
+
+echo "bump-my-version installed"
