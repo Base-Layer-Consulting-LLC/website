@@ -6,9 +6,9 @@ set -euo pipefail
 ############################################
 
 THIS_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-ROOT_DIR=$(realpath -m "${THIS_DIR}/../..")
+ROOT_DIR="$(realpath -m "${THIS_DIR}/../..")"
 
-CURRENT_VERSION="$(<VERSION)"
+CURRENT_VERSION="$(<"${ROOT_DIR}/VERSION")"
 DRY_RUN=false
 BUMP_TYPE=""
 CWD="$(pwd)"
@@ -17,8 +17,6 @@ function usage() {
   cat <<EOF
 Usage:
   ${0} [OPTIONS]
-
-
 
 Options:
   -b, --bump-type   Bump type: major, minor, patch
@@ -68,8 +66,6 @@ major | minor | patch) ;;
   ;;
 esac
 
-cd "$ROOT_DIR/site"
-
 IFS='.' read -r major minor patch <<<"$CURRENT_VERSION"
 case "$BUMP_TYPE" in
 major)
@@ -92,5 +88,5 @@ if $DRY_RUN; then
   exit 0
 fi
 
-cmd=(bump-my-version bump --current-version "$CURRENT_VERSION" "$BUMP_TYPE")
-"${cmd[@]}"
+echo "$NEXT_VERSION" >"${ROOT_DIR}/VERSION"
+echo "Bumped VERSION from $CURRENT_VERSION to $NEXT_VERSION"
