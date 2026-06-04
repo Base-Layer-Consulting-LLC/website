@@ -29,4 +29,4 @@ jobs:
       - name: Run PR release check
         env:
           ASTRO_TELEMETRY_DISABLED: "1"
-        run: ./scripts/release/release.sh pr main
+        run: ./scripts/release/release.sh pr --base-branch main

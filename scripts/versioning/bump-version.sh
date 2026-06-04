@@ -8,8 +8,9 @@ set -euo pipefail
 DRY_RUN=false
 PRINT_NEXT_VERSION=false
 BUMP_TYPE=""
+ROOT_DIR="$(git rev-parse --show-toplevel)"
 
-usage() {
+function usage() {
   cat <<EOF
 Usage:
   $0 -b <major|minor|patch> [--dry-run] [--print-next-version]
@@ -47,6 +48,8 @@ if [[ -z "$BUMP_TYPE" ]]; then
   usage
   exit 1
 fi
+
+cd "$ROOT_DIR"
 
 CURRENT_VERSION="$(<VERSION)"
 

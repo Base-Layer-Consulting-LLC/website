@@ -58,7 +58,3 @@ tar -C "$TMP_BUILD_DIR" -czf "${REPO_ROOT}/${ARCHIVE_NAME}" .
 rm -rf "$TMP_BUILD_DIR"
 
 echo "${ARCHIVE_NAME}"
-
-if $DRY_RUN; then
-  echo "Dry run: archive created locally only"
-fi

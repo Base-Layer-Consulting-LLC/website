@@ -52,4 +52,4 @@ jobs:
             BASE_BRANCH="main"
           fi
 
-          ./scripts/release/release.sh $DRY_RUN_FLAG release "$BASE_BRANCH"
+          ./scripts/release/release.sh $DRY_RUN_FLAG release --base-branch "$BASE_BRANCH"
