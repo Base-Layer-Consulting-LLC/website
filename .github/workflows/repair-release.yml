@@ -12,14 +12,17 @@ on:
         description: Version to repair. Defaults to VERSION file.
         required: false
         default: ""
+        type: string
       commit:
         description: Commit SHA to check out before tagging. Optional.
         required: false
         default: ""
+        type: string
       dry_run:
         description: Run without changing anything
         required: false
-        default: "false"
+        default: false
+        type: boolean
 
 jobs:
   repair:
