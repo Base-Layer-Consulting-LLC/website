@@ -6,18 +6,18 @@ set -euo pipefail
 #######################################################################
 
 THIS_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-ROOT_DIR="$(realpath -m "${THIS_DIR}/../..")"
+REPO_ROOT="$(realpath -m "${THIS_DIR}/../..")"
 
-VERSION="$(<"${ROOT_DIR}/VERSION")"
-SITE_DIR="${ROOT_DIR}/site"
-TMP_SITE_DIR="${ROOT_DIR}/.release-site"
+VERSION="$(<"${REPO_ROOT}/VERSION")"
+BUILD_DIR="${REPO_ROOT}/site/dist"
 ARCHIVE_NAME="site-v${VERSION}.tar.gz"
+TMP_BUILD_DIR="${REPO_ROOT}/.release-site"
 
-rm -rf "$TMP_SITE_DIR"
-cp -R "$SITE_DIR" "$TMP_SITE_DIR"
-cp "${ROOT_DIR}/VERSION" "${TMP_SITE_DIR}/VERSION"
+rm -rf "$TMP_BUILD_DIR"
+cp -R "$BUILD_DIR" "$TMP_BUILD_DIR"
+cp "${REPO_ROOT}/VERSION" "${TMP_BUILD_DIR}/VERSION"
 
-tar -C "$TMP_SITE_DIR" -czf "${ROOT_DIR}/${ARCHIVE_NAME}" .
-rm -rf "$TMP_SITE_DIR"
+tar -C "$TMP_BUILD_DIR" -czf "${REPO_ROOT}/${ARCHIVE_NAME}" .
+rm -rf "$TMP_BUILD_DIR"
 
 echo "${ARCHIVE_NAME}"

@@ -25,7 +25,6 @@ if [[ "$MODE" == "release" ]]; then
 fi
 
 BUMPTYPE="$(./scripts/versioning/detect-bump.sh "$BASE_BRANCH" || true)"
-
 if [[ -z "$BUMPTYPE" ]]; then
   echo "No version bump required"
   exit 0
@@ -34,8 +33,8 @@ fi
 echo "Detected bump type: $BUMPTYPE"
 
 if [[ "$MODE" == "pr" ]]; then
-  echo "PR mode: running test build only"
-  ./scripts/build-site.sh
+  echo "PR mode: running Astro build only"
+  ./scripts/astro/build.sh
   exit 0
 fi
 
@@ -47,15 +46,23 @@ fi
 ./scripts/versioning/bump-version.sh --bump-type "$BUMPTYPE"
 
 VERSION="$(<VERSION)"
-ARCHIVE_NAME="site-v${VERSION}.tar.gz"
+TAG_NAME="v${VERSION}"
+RELEASE_NAME="site-v${VERSION}"
 
 git config user.name "github-actions[bot]"
 git config user.email "github-actions[bot]@users.noreply.github.com"
 git add VERSION
 git commit -m "chore(release): bump version to ${VERSION} [release skip]"
-git tag -a "v${VERSION}" -m "Release v${VERSION}"
-git push origin HEAD:main
-git push origin "v${VERSION}"
 
+git push origin HEAD:main
+git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
+git push origin "$TAG_NAME"
+
+./scripts/astro/build.sh
 ./scripts/release/package-site.sh
-./scripts/release/create-release.sh
+
+gh release create "$TAG_NAME" \
+  --title "$RELEASE_NAME" \
+  --notes "Release ${RELEASE_NAME}"
+
+gh release upload "$TAG_NAME" "site-v${VERSION}.tar.gz" --clobber
