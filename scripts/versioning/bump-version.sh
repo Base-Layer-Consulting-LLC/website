@@ -5,32 +5,17 @@ set -euo pipefail
 # Bump a version file with bump-my-version #
 ############################################
 
-THIS_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-ROOT_DIR=$(realpath -m "${THIS_DIR}/../..")
-
-CURRENT_VERSION="$(<VERSION)"
 DRY_RUN=false
+PRINT_NEXT_VERSION=false
 BUMP_TYPE=""
-CWD="$(pwd)"
+ROOT_DIR="$(git rev-parse --show-toplevel)"
 
 function usage() {
   cat <<EOF
 Usage:
-  ${0} [OPTIONS]
-
-
-
-Options:
-  -b, --bump-type   Bump type: major, minor, patch
-  --dry-run         Show what would happen without changing files
-  -h, --help        Show this help menu
+  $0 -b <major|minor|patch> [--dry-run] [--print-next-version]
 EOF
 }
-
-function cleanup() {
-  cd "${CWD}"
-}
-trap cleanup EXIT
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -42,12 +27,16 @@ while [[ $# -gt 0 ]]; do
     DRY_RUN=true
     shift
     ;;
+  --print-next-version)
+    PRINT_NEXT_VERSION=true
+    shift
+    ;;
   -h | --help)
     usage
     exit 0
     ;;
   *)
-    echo "[ERROR] Invalid arg: $1" >&2
+    echo "[ERROR] Unknown arg: $1" >&2
     usage
     exit 1
     ;;
@@ -55,22 +44,16 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ -z "$BUMP_TYPE" ]]; then
-  echo "[ERROR] --bump-type is required" >&2
+  echo "[ERROR] Missing bump type" >&2
   usage
   exit 1
 fi
 
-case "$BUMP_TYPE" in
-major | minor | patch) ;;
-*)
-  echo "[ERROR] Invalid bump type: $BUMP_TYPE" >&2
-  exit 1
-  ;;
-esac
+cd "$ROOT_DIR"
 
-cd "$ROOT_DIR/site"
+CURRENT_VERSION="$(<VERSION)"
 
-IFS='.' read -r major minor patch <<<"$CURRENT_VERSION"
+IFS=. read -r major minor patch <<<"$CURRENT_VERSION"
 case "$BUMP_TYPE" in
 major)
   major=$((major + 1))
@@ -81,16 +64,24 @@ minor)
   minor=$((minor + 1))
   patch=0
   ;;
-patch)
-  patch=$((patch + 1))
+patch) patch=$((patch + 1)) ;;
+*)
+  echo "[ERROR] Invalid bump type: $BUMP_TYPE" >&2
+  exit 1
   ;;
 esac
+
 NEXT_VERSION="${major}.${minor}.${patch}"
 
-if $DRY_RUN; then
-  echo "Would bump VERSION from $CURRENT_VERSION to $NEXT_VERSION"
+if $PRINT_NEXT_VERSION; then
+  echo "$NEXT_VERSION"
   exit 0
 fi
 
-cmd=(bump-my-version bump --current-version "$CURRENT_VERSION" "$BUMP_TYPE")
-"${cmd[@]}"
+if $DRY_RUN; then
+  echo "Would bump VERSION from ${CURRENT_VERSION} to ${NEXT_VERSION}"
+  exit 0
+fi
+
+echo "$NEXT_VERSION" >"${ROOT_DIR}/VERSION"
+echo "Bumped VERSION from ${CURRENT_VERSION} to ${NEXT_VERSION}"

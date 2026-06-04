@@ -1,0 +1,55 @@
+---
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Run without committing, tagging, or publishing
+        required: false
+        default: "false"
+      base_branch:
+        description: Base branch to compare against
+        required: false
+        default: main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Make scripts executable
+        run: chmod +x scripts/versioning/*.sh scripts/release/*.sh scripts/install/*.sh scripts/astro/*.sh
+
+      - name: Install required tools
+        run: |
+          ./scripts/install/git.sh
+          ./scripts/install/curl.sh
+          ./scripts/install/node.sh
+          ./scripts/install/bump-my-version.sh
+          ./scripts/install/gh.sh
+
+      - name: Run release
+        env:
+          ASTRO_TELEMETRY_DISABLED: "1"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DRY_RUN_FLAG=""
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.dry_run }}" == "true" ]]; then
+            DRY_RUN_FLAG="--dry-run"
+          fi
+
+          BASE_BRANCH="${{ inputs.base_branch }}"
+          if [[ -z "$BASE_BRANCH" ]]; then
+            BASE_BRANCH="main"
+          fi
+
+          ./scripts/release/release.sh $DRY_RUN_FLAG release --base-branch "$BASE_BRANCH"
