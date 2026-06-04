@@ -1,0 +1,32 @@
+---
+name: PR validation
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Make scripts executable
+        run: chmod +x scripts/versioning/*.sh scripts/release/*.sh scripts/install/*.sh scripts/astro/*.sh
+
+      - name: Install required tools
+        run: |
+          ./scripts/install/git.sh
+          ./scripts/install/curl.sh
+          ./scripts/install/node.sh
+          ./scripts/install/bump-my-version.sh
+          ./scripts/install/gh.sh
+
+      - name: Run PR release check
+        env:
+          ASTRO_TELEMETRY_DISABLED: "1"
+        run: ./scripts/release/release.sh pr main
