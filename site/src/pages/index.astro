@@ -1,6 +1,7 @@
 ---
 import ScrollSectionLayout from "../layouts/ScrollSectionLayout.astro";
 import LogoTransparent from "../components/image/logo/LogoTransparent.astro";
+import ContactForm from "../components/forms/ContactForm.astro";
 import { site } from "../config/site";
 ---
 
@@ -105,6 +106,26 @@ import { site } from "../config/site";
           </div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- Contact section -->
+  <section class="snap-start h-dvh flex items-center justify-center px-6 py-10">
+    <div
+      class="mx-auto max-w-2xl w-full rounded-3xl border border-base-300 bg-base-100/80 p-8 shadow-xl"
+    >
+      <div class="text-center space-y-4 mb-8">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold">Let's talk</h2>
+
+        <p class="text-base sm:text-lg opacity-80">
+          Send a message and I'll get back to you by email.
+        </p>
+        <p class="text-base sm:text-sm opacity-80">
+          (response time: 3-5 business days)
+        </p>
+      </div>
+
+      <ContactForm />
     </div>
   </section>
 </ScrollSectionLayout>
