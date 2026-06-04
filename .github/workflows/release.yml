@@ -4,6 +4,16 @@ name: Release
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Run without committing, tagging, or publishing
+        required: false
+        default: "false"
+      base_branch:
+        description: Base branch to compare against
+        required: false
+        default: main
 
 jobs:
   release:
@@ -31,4 +41,15 @@ jobs:
           ASTRO_TELEMETRY_DISABLED: "1"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./scripts/release/release.sh release main
+        run: |
+          DRY_RUN_FLAG=""
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.dry_run }}" == "true" ]]; then
+            DRY_RUN_FLAG="--dry-run"
+          fi
+
+          BASE_BRANCH="${{ inputs.base_branch }}"
+          if [[ -z "$BASE_BRANCH" ]]; then
+            BASE_BRANCH="main"
+          fi
+
+          ./scripts/release/release.sh $DRY_RUN_FLAG release "$BASE_BRANCH"

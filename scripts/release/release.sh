@@ -5,18 +5,52 @@ set -euo pipefail
 # Orchestrate version bump, packaging, tagging, and release. #
 ##############################################################
 
-MODE="${1:-}"
-BASE_BRANCH="${2:-main}"
+DRY_RUN=false
+MODE=""
+BASE_BRANCH="main"
+
+function usage() {
+  cat <<EOF
+Usage:
+  $0 [--dry-run] <pr|release> [base-branch]
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+  --dry-run)
+    DRY_RUN=true
+    shift
+    ;;
+  pr | release)
+    MODE="$1"
+    shift
+    ;;
+  -b | --base-branch)
+    BASE_BRANCH="${2:-main}"
+    shift 2
+    ;;
+  -h | --help)
+    usage
+    exit 0
+    ;;
+  *)
+    echo "[ERROR] Unknown arg: $1" >&2
+    usage
+    exit 1
+    ;;
+  esac
+done
 
 if [[ -z "$MODE" ]]; then
-  echo "Usage: $0 <pr|release> [base-branch]" >&2
+  usage
   exit 1
 fi
 
 ROOT_DIR="$(git rev-parse --show-toplevel)"
 cd "$ROOT_DIR"
 
-if [[ "$MODE" == "release" ]]; then
+if [[ "$MODE" == "release" && "$DRY_RUN" == false ]]; then
   HEAD_MSG="$(git log -1 --pretty=%B)"
   if grep -q '\[release skip\]' <<<"$HEAD_MSG"; then
     echo "Release commit detected; skipping release workflow."
@@ -38,16 +72,19 @@ if [[ "$MODE" == "pr" ]]; then
   exit 0
 fi
 
-if [[ "$MODE" != "release" ]]; then
-  echo "Usage: $0 <pr|release> [base-branch]" >&2
-  exit 1
+if $DRY_RUN; then
+  ./scripts/versioning/bump-version.sh --bump-type "$BUMPTYPE" --dry-run
+  ./scripts/astro/build.sh
+  ./scripts/release/package-site.sh --dry-run
+  ./scripts/release/create-release.sh --dry-run
+  echo "Dry run: skipping commit, tag, push, and upload"
+  exit 0
 fi
 
 ./scripts/versioning/bump-version.sh --bump-type "$BUMPTYPE"
 
 VERSION="$(<VERSION)"
 TAG_NAME="v${VERSION}"
-RELEASE_NAME="site-v${VERSION}"
 
 git config user.name "github-actions[bot]"
 git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -60,9 +97,4 @@ git push origin "$TAG_NAME"
 
 ./scripts/astro/build.sh
 ./scripts/release/package-site.sh
-
-gh release create "$TAG_NAME" \
-  --title "$RELEASE_NAME" \
-  --notes "Release ${RELEASE_NAME}"
-
-gh release upload "$TAG_NAME" "site-v${VERSION}.tar.gz" --clobber
+./scripts/release/create-release.sh
