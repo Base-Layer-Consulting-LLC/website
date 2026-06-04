@@ -9,7 +9,7 @@ DRY_RUN="${INPUT_DRY_RUN:-false}"
 VERSION="${INPUT_VERSION:-}"
 COMMIT_SHA=""
 
-usage() {
+function usage() {
   cat <<EOF
 Usage:
   $0 [--dry-run] [--version <version>] [--commit <sha>]
