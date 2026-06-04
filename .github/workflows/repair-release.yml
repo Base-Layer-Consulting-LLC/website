@@ -47,6 +47,10 @@ jobs:
           ./scripts/install/bump-my-version.sh
           ./scripts/install/gh.sh
 
+      - name: Install site dependencies
+        working-directory: site
+        run: npm ci
+
       - name: Configure git identity
         run: |
           git config --global user.name "github-actions[bot]"

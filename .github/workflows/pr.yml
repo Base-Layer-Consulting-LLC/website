@@ -26,6 +26,10 @@ jobs:
           ./scripts/install/bump-my-version.sh
           ./scripts/install/gh.sh
 
+      - name: Install site dependencies
+        working-directory: site
+        run: npm ci
+
       - name: Run PR release check
         env:
           ASTRO_TELEMETRY_DISABLED: "1"
