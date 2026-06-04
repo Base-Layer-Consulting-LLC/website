@@ -19,6 +19,7 @@ Usage:
   ${0} [OPTIONS]
 
 
+
 Options:
   -b, --bump-type   Bump type: major, minor, patch
   --dry-run         Show what would happen without changing files
@@ -69,12 +70,25 @@ esac
 
 cd "$ROOT_DIR/site"
 
+IFS='.' read -r major minor patch <<<"$CURRENT_VERSION"
+case "$BUMP_TYPE" in
+major)
+  major=$((major + 1))
+  minor=0
+  patch=0
+  ;;
+minor)
+  minor=$((minor + 1))
+  patch=0
+  ;;
+patch)
+  patch=$((patch + 1))
+  ;;
+esac
+NEXT_VERSION="${major}.${minor}.${patch}"
+
 if $DRY_RUN; then
-  if NEXT_VERSION="$(bump-my-version show --current-version "$CURRENT_VERSION" --increment "$BUMP_TYPE" new_version 2>/dev/null)"; then
-    echo "Would bump VERSION from $CURRENT_VERSION to $NEXT_VERSION"
-  else
-    echo "No version was bumped"
-  fi
+  echo "Would bump VERSION from $CURRENT_VERSION to $NEXT_VERSION"
   exit 0
 fi
 
