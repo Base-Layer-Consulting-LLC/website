@@ -1,0 +1,54 @@
+---
+###########################################################################
+# Manual pipeline to ensure a git tag & release exist for current version #
+###########################################################################
+
+name: Repair missing release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to repair. Defaults to VERSION file.
+        required: false
+        default: ""
+      commit:
+        description: Commit SHA to check out before tagging. Optional.
+        required: false
+        default: ""
+      dry_run:
+        description: Run without changing anything
+        required: false
+        default: "false"
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.commit != '' && inputs.commit || github.ref }}
+
+      - name: Make scripts executable
+        run: chmod +x scripts/versioning/*.sh scripts/release/*.sh scripts/install/*.sh scripts/astro/*.sh
+
+      - name: Install required tools
+        run: |
+          ./scripts/install/git.sh
+          ./scripts/install/curl.sh
+          ./scripts/install/node.sh
+          ./scripts/install/bump-my-version.sh
+          ./scripts/install/gh.sh
+
+      - name: Repair missing release
+        env:
+          ASTRO_TELEMETRY_DISABLED: "1"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_VERSION: ${{ inputs.version }}
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+        run: ./scripts/release/repair-release.sh
