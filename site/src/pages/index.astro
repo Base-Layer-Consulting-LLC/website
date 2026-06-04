@@ -1,46 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import HelloWorld from "../components/demo/HelloWorld.astro";
-import ExButton from "../components/demo/ExButton.astro";
-import ExCard from "../components/demo/ExCard.astro";
-import ExIconHouse from "../components/demo/ExIconHouse.astro";
-import LogoTransparent from "../components/image/logo/LogoTransparent.astro";
-
-import HomeHero from "../components/image/hero/HomeHero.astro";
-import heroImage from "../assets/img/hero-network-points.jpg";
 import { site } from "../config/site";
 ---
 
-<BaseLayout title={site.nameShort}>
-  <div class="w-[94vw] mx-auto">
-    <!-- <HomeHero imgSrc={heroImage} imgAlt="">
-      <LogoTransparent />
-
-      <h1 class="text-3xl px-2 sm:text-4xl lg:text-6xl font-semibold">
-        Base Layer Consulting LLC
-      </h1>
-    </HomeHero> -->
-
-    <HomeHero imgSrc={heroImage} imgAlt="">
-      <div slot="brand">
-        <div class="flex items-center justify-center gap-3">
-          <LogoTransparent class="h-10 w-10 lg:h-12 lg:w-12" />
-
-          <h1 class="text-xl sm:text-2xl lg:text-4xl font-semibold text-white">
-            {site.name}
-          </h1>
-        </div>
-      </div>
-
-      <div slot="tagline">
-        {site.tagline}
-      </div>
-
-      <div slot="card">
-        <p><strong>Email:</strong> {site.emailMain}</p>
-        <p><strong>Use for:</strong> General inquiries</p>
-        <p><strong>Response time:</strong> 3-5 business days</p>
-      </div>
-    </HomeHero>
-  </div>
-</BaseLayout>
+<BaseLayout title={site.nameShort} />
