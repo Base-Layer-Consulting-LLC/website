@@ -1,46 +1,132 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import HelloWorld from "../components/demo/HelloWorld.astro";
-import ExButton from "../components/demo/ExButton.astro";
-import ExCard from "../components/demo/ExCard.astro";
-import ExIconHouse from "../components/demo/ExIconHouse.astro";
+import ScrollSectionLayout from "../layouts/ScrollSectionLayout.astro";
 import LogoTransparent from "../components/image/logo/LogoTransparent.astro";
-
-import HomeHero from "../components/image/hero/HomeHero.astro";
-import heroImage from "../assets/img/hero-network-points.jpg";
+import ContactForm from "../components/forms/ContactForm.astro";
 import { site } from "../config/site";
 ---
 
-<BaseLayout title={site.nameShort}>
-  <div class="w-[94vw] mx-auto">
-    <!-- <HomeHero imgSrc={heroImage} imgAlt="">
-      <LogoTransparent />
+<ScrollSectionLayout title={site.name}>
+  <!-- Landing page section -->
+  <section class="snap-start h-dvh flex items-center justify-center px-6">
+    <div class="max-w-5xl text-center space-y-6 flex flex-col items-center">
+      <LogoTransparent class="h-32 w-32 sm:h-32 sm:w-32 lg:h-48 lg:w-48" />
 
-      <h1 class="text-3xl px-2 sm:text-4xl lg:text-6xl font-semibold">
-        Base Layer Consulting LLC
+      <h1 class="text-4xl sm:text-5xl lg:text-7xl font-bold">
+        {site.name}
       </h1>
-    </HomeHero> -->
 
-    <HomeHero imgSrc={heroImage} imgAlt="">
-      <div slot="brand">
-        <div class="flex items-center justify-center gap-3">
-          <LogoTransparent class="h-10 w-10 lg:h-12 lg:w-12" />
+      <p class="text-lg sm:text-xl opacity-80 pt-3">
+        {site.tagline}
+      </p>
 
-          <h1 class="text-xl sm:text-2xl lg:text-4xl font-semibold text-white">
-            {site.name}
-          </h1>
+      <div class="pt-6 text-md opacity-70 space-y-2">
+        <p>© {new Date().getFullYear()} {site.name}</p>
+        <p>{site.emailMain}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services section -->
+  <section
+    class="snap-start h-dvh flex items-start md:items-center justify-center px-6 py-10 md:py-8"
+  >
+    <div class="mx-auto max-w-5xl w-full text-center space-y-8">
+      <div class="max-w-2xl mx-auto pt-6 md:pt-0">
+        <h2 class="text-4xl sm:text-5xl lg:text-7xl font-bold pb-4 md:pb-2">
+          Services
+        </h2>
+
+        <p class="mt-4 py-4 text-base sm:text-lg opacity-80">
+          With over a decade of experience in both infrastructure and backend
+          software development, I help small businesses and growing teams build
+          a stable foundation for business success
+        </p>
+      </div>
+
+      <div
+        class="max-h-[52dvh] md:max-h-none overflow-y-auto overscroll-y-contain pr-1"
+      >
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
+          <div class="card bg-base-200 shadow-sm text-left lg:col-span-2">
+            <div class="card-body">
+              <h3 class="card-title text-lg">Automation</h3>
+              <p>
+                Streamline repetitive tasks and improve workflows with simple,
+                practical automation. Turn pain points into background noise.
+              </p>
+            </div>
+          </div>
+
+          <div class="card bg-base-200 shadow-sm text-left lg:col-span-2">
+            <div class="card-body">
+              <h3 class="card-title text-lg">Cloud & Infrastructure</h3>
+              <p>
+                Optimize spend by finding over-provisioned resources and
+                ineffeficiencies in your environment. Set up or improve
+                application monitoring and alerting. Feel peace of mind with a
+                good backup strategy for your core infrastructure.
+              </p>
+            </div>
+          </div>
+
+          <div class="card bg-base-200 shadow-sm text-left lg:col-span-2">
+            <div class="card-body">
+              <h3 class="card-title text-lg">Platform Engineering</h3>
+              <p>
+                Improve Developer velocity and experience with GitOps and
+                DevOps. I build platforms, tools, and processes to reduce
+                friction and let Developers do what they do best: build.
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="card bg-base-200 shadow-sm text-left lg:col-span-2 lg:col-start-2"
+          >
+            <div class="card-body">
+              <h3 class="card-title text-lg">Monitoring</h3>
+              <p>
+                Visibility into systems and services so problems are caught
+                before they become outages. Detect problems in real time, and
+                scope in on where they originated. Let me do the sleuthing while
+                you get back to building.
+              </p>
+            </div>
+          </div>
+
+          <div class="card bg-base-200 shadow-sm text-left lg:col-span-2">
+            <div class="card-body">
+              <h3 class="card-title text-lg">Consulting</h3>
+              <p>
+                Architecture planning, software development lifecycle design,
+                choosing the tools for your trade, and building a stable
+                technical foundation you can grow your business on.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
+    </div>
+  </section>
 
-      <div slot="tagline">
-        {site.tagline}
+  <!-- Contact section -->
+  <section
+    class="snap-start h-dvh flex items-center justify-center px-0 sm:px-6 py-6 sm:py-10"
+  >
+    <div
+      class="w-full max-w-none sm:max-w-2xl rounded-none sm:rounded-3xl border border-base-300 bg-base-100/80 p-4 sm:p-8 shadow-none sm:shadow-xl"
+    >
+      <div class="text-center space-y-4 mb-6 sm:mb-8">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold">Contact</h2>
+        <p class="text-base sm:text-lg opacity-80">
+          Send a message and I'll get back to you by email.
+        </p>
+        <p class="text-base sm:text-sm opacity-80">
+          (response time: 3-5 business days)
+        </p>
       </div>
 
-      <div slot="card">
-        <p><strong>Email:</strong> {site.emailMain}</p>
-        <p><strong>Use for:</strong> General inquiries</p>
-        <p><strong>Response time:</strong> 3-5 business days</p>
-      </div>
-    </HomeHero>
-  </div>
-</BaseLayout>
+      <ContactForm />
+    </div>
+  </section>
+</ScrollSectionLayout>

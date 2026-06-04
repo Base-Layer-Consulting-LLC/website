@@ -8,13 +8,15 @@ interface Props {
   class?: string;
 }
 
-const { class: className = "", alt = "Base Layer Consulting logo" } =
-  Astro.props;
+const {
+  class: className = "h-8 w-8 sm:h-10 sm:w-10 lg:h-24 lg:w-24",
+  alt = "Base Layer Consulting logo",
+} = Astro.props;
 ---
 
 <Image
   src={brandLogo}
   alt={alt}
-  class={`block h-8 w-8 sm:h-10 sm:w-10 lg:h-24 lg:w-24 ${className}`.trim()}
+  class={`block ${className}`.trim()}
   loading="eager"
 />
