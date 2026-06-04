@@ -5,13 +5,19 @@ set -euo pipefail
 # Bump a version file with bump-my-version #
 ############################################
 
+THIS_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+ROOT_DIR=$(realpath -m "${THIS_DIR}/../..")
+
+CURRENT_VERSION="$(<VERSION)"
 DRY_RUN=false
 BUMP_TYPE=""
+CWD="$(pwd)"
 
 function usage() {
   cat <<EOF
 Usage:
   ${0} [OPTIONS]
+
 
 Options:
   -b, --bump-type   Bump type: major, minor, patch
@@ -19,6 +25,11 @@ Options:
   -h, --help        Show this help menu
 EOF
 }
+
+function cleanup() {
+  cd "${CWD}"
+}
+trap cleanup EXIT
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -56,13 +67,16 @@ major | minor | patch) ;;
   ;;
 esac
 
-ROOT_DIR="$(git rev-parse --show-toplevel)"
 cd "$ROOT_DIR/site"
 
-cmd=(bump-my-version bump "$BUMP_TYPE")
-
 if $DRY_RUN; then
-  cmd+=(--dry-run)
+  if NEXT_VERSION="$(bump-my-version show --current-version "$CURRENT_VERSION" --increment "$BUMP_TYPE" new_version 2>/dev/null)"; then
+    echo "Would bump VERSION from $CURRENT_VERSION to $NEXT_VERSION"
+  else
+    echo "No version was bumped"
+  fi
+  exit 0
 fi
 
+cmd=(bump-my-version bump --current-version "$CURRENT_VERSION" "$BUMP_TYPE")
 "${cmd[@]}"
