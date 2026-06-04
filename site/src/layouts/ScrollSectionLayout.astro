@@ -1,0 +1,27 @@
+---
+import "../styles/global.css";
+import Favicon from "../components/image/favicon/Favicon.astro";
+import { site } from "../config/site";
+
+interface Props {
+  title?: string;
+}
+
+const { title = site.name } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <Favicon />
+  </head>
+
+  <body class="m-0 overflow-hidden bg-base-100 text-base-content">
+    <main class="h-dvh overflow-y-auto scroll-smooth snap-y snap-mandatory">
+      <slot />
+    </main>
+  </body>
+</html>

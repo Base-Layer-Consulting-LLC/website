@@ -1,6 +1,26 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
+import ScrollSectionLayout from "../layouts/ScrollSectionLayout.astro";
+import LogoTransparent from "../components/image/logo/LogoTransparent.astro";
 import { site } from "../config/site";
 ---
 
-<BaseLayout title={site.nameShort} />
+<ScrollSectionLayout title={site.name}>
+  <section class="snap-start h-dvh flex items-center justify-center px-6">
+    <div class="max-w-5xl text-center space-y-6 flex flex-col items-center">
+      <LogoTransparent class="h-32 w-32 sm:h-32 sm:w-32 lg:h-48 lg:w-48" />
+
+      <h1 class="text-4xl sm:text-5xl lg:text-7xl font-bold">
+        {site.name}
+      </h1>
+
+      <p class="text-lg sm:text-xl opacity-80 pt-3">
+        {site.tagline}
+      </p>
+
+      <div class="pt-6 text-md opacity-70 space-y-2">
+        <p>© {new Date().getFullYear()} {site.name}</p>
+        <p>{site.emailMain}</p>
+      </div>
+    </div>
+  </section>
+</ScrollSectionLayout>
