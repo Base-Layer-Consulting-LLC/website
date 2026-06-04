@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+############################################
+# Bump a version file with bump-my-version #
+############################################
+
 DRY_RUN=false
+BUMP_TYPE=""
 
 function usage() {
   cat <<EOF
@@ -9,13 +14,18 @@ Usage:
   ${0} [OPTIONS]
 
 Options:
-  -h, --help    Show this help menu
-  --dry-run     Show the version bump that would happen, without actually bumping
+  -b, --bump-type   Bump type: major, minor, patch
+  --dry-run         Show what would happen without changing files
+  -h, --help        Show this help menu
 EOF
 }
 
 while [[ $# -gt 0 ]]; do
-  case $1 in
+  case "$1" in
+  -b | --bump-type)
+    BUMP_TYPE="${2:-}"
+    shift 2
+    ;;
   --dry-run)
     DRY_RUN=true
     shift
@@ -32,39 +42,27 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+if [[ -z "$BUMP_TYPE" ]]; then
+  echo "[ERROR] --bump-type is required" >&2
+  usage
+  exit 1
+fi
+
+case "$BUMP_TYPE" in
+major | minor | patch) ;;
+*)
+  echo "[ERROR] Invalid bump type: $BUMP_TYPE" >&2
+  exit 1
+  ;;
+esac
+
 ROOT_DIR="$(git rev-parse --show-toplevel)"
 cd "$ROOT_DIR/site"
 
-if ! git diff --quiet HEAD -- .; then
-  :
-else
-  echo "No changes under site/, skipping bump"
-  exit 0
-fi
-
-BASE_REF="$(git describe --tags --abbrev=0 2>/dev/null || echo '')"
-if [[ -z "$BASE_REF" ]]; then
-  BASE_REF="$(git rev-list --max-parents=0 HEAD)"
-fi
-
-COMMITS="$(git log --format=%B "${BASE_REF}..HEAD")"
-
-if grep -Eq 'BREAKING CHANGE|!:' <<<"$COMMITS"; then
-  PART="major"
-elif grep -Eq '^feat(\(.+\))?:' <<<"$COMMITS"; then
-  PART="minor"
-elif grep -Eq '^fix(\(.+\))?:' <<<"$COMMITS"; then
-  PART="patch"
-else
-  echo "No conventional bump-worthy commits found since $BASE_REF"
-  exit 0
-fi
-
-echo "Next bump: $PART"
-echo
-
-cmd=(bump-my-version bump "$PART")
+cmd=(bump-my-version bump "$BUMP_TYPE")
 
 if $DRY_RUN; then
   cmd+=(--dry-run)
 fi
+
+"${cmd[@]}"
