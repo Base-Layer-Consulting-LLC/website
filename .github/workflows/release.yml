@@ -32,9 +32,15 @@ jobs:
         run: |
           ./scripts/install/git.sh
           ./scripts/install/curl.sh
-          ./scripts/install/node.sh
           ./scripts/install/bump-my-version.sh
           ./scripts/install/gh.sh
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: site/package-lock.json
 
       - name: Install site dependencies
         working-directory: site
