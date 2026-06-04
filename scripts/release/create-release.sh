@@ -6,9 +6,10 @@ set -euo pipefail
 ##########################################################
 
 DRY_RUN=false
+VERSION=""
 
 function usage() {
-  echo "Usage: $0 [--dry-run]"
+  echo "Usage: $0 [--dry-run] [--version <version>]"
 }
 
 while [[ $# -gt 0 ]]; do
@@ -16,6 +17,10 @@ while [[ $# -gt 0 ]]; do
   --dry-run)
     DRY_RUN=true
     shift
+    ;;
+  --version)
+    VERSION="${2:-}"
+    shift 2
     ;;
   -h | --help)
     usage
@@ -31,7 +36,11 @@ done
 
 THIS_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 ROOT_DIR="$(realpath -m "${THIS_DIR}/../..")"
-VERSION="$(<"${ROOT_DIR}/VERSION")"
+
+if [[ -z "$VERSION" ]]; then
+  VERSION="$(<"${ROOT_DIR}/VERSION")"
+fi
+
 ARCHIVE_NAME="site-v${VERSION}.tar.gz"
 TAG_NAME="v${VERSION}"
 RELEASE_NAME="site-v${VERSION}"

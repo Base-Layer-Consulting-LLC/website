@@ -6,24 +6,29 @@ set -euo pipefail
 ############################################
 
 DRY_RUN=false
+PRINT_NEXT_VERSION=false
 BUMP_TYPE=""
 
-function usage() {
+usage() {
   cat <<EOF
 Usage:
-  $0 --bump-type <major|minor|patch> [--dry-run]
+  $0 -b <major|minor|patch> [--dry-run] [--print-next-version]
 EOF
 }
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
+  -b | --bump-type)
+    BUMP_TYPE="${2:-}"
+    shift 2
+    ;;
   --dry-run)
     DRY_RUN=true
     shift
     ;;
-  --bump-type | -b)
-    BUMP_TYPE="${2:-}"
-    shift 2
+  --print-next-version)
+    PRINT_NEXT_VERSION=true
+    shift
     ;;
   -h | --help)
     usage
@@ -38,16 +43,14 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ -z "$BUMP_TYPE" ]]; then
-  echo "[ERROR] --bump-type is required" >&2
+  echo "[ERROR] Missing bump type" >&2
   usage
   exit 1
 fi
 
-THIS_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-ROOT_DIR="$(realpath -m "${THIS_DIR}/../..")"
-CURRENT_VERSION="$(<"${ROOT_DIR}/VERSION")"
+CURRENT_VERSION="$(<VERSION)"
 
-IFS='.' read -r major minor patch <<<"$CURRENT_VERSION"
+IFS=. read -r major minor patch <<<"$CURRENT_VERSION"
 case "$BUMP_TYPE" in
 major)
   major=$((major + 1))
@@ -66,6 +69,11 @@ patch) patch=$((patch + 1)) ;;
 esac
 
 NEXT_VERSION="${major}.${minor}.${patch}"
+
+if $PRINT_NEXT_VERSION; then
+  echo "$NEXT_VERSION"
+  exit 0
+fi
 
 if $DRY_RUN; then
   echo "Would bump VERSION from ${CURRENT_VERSION} to ${NEXT_VERSION}"

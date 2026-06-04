@@ -9,10 +9,10 @@ DRY_RUN=false
 MODE=""
 BASE_BRANCH="main"
 
-function usage() {
+usage() {
   cat <<EOF
 Usage:
-  $0 [--dry-run] <pr|release> [base-branch]
+  $0 [--dry-run] <pr|release> [--base-branch <branch>]
 EOF
 }
 
@@ -72,17 +72,25 @@ if [[ "$MODE" == "pr" ]]; then
   exit 0
 fi
 
+CURRENT_VERSION="$(<VERSION)"
+NEXT_VERSION="$(./scripts/versioning/bump-version.sh -b "$BUMPTYPE" --print-next-version)"
+
 if $DRY_RUN; then
-  ./scripts/versioning/bump-version.sh --bump-type "$BUMPTYPE" --dry-run
+  echo "Dry run preview:"
+  echo "  Current VERSION: ${CURRENT_VERSION}"
+  echo "  Next VERSION:    ${NEXT_VERSION}"
+  echo "  Archive name:    site-v${CURRENT_VERSION}.tar.gz"
+  echo "  No commit, tag, or release will be created."
+
+  ./scripts/versioning/bump-version.sh -b "$BUMPTYPE" --dry-run
   ./scripts/astro/build.sh
-  ./scripts/release/package-site.sh --dry-run
-  ./scripts/release/create-release.sh --dry-run
+  ./scripts/release/package-site.sh --dry-run --version "$CURRENT_VERSION"
+  ./scripts/release/create-release.sh --dry-run --version "$CURRENT_VERSION"
   echo "Dry run: skipping commit, tag, push, and upload"
   exit 0
 fi
 
-./scripts/versioning/bump-version.sh --bump-type "$BUMPTYPE"
-
+./scripts/versioning/bump-version.sh -b "$BUMPTYPE"
 VERSION="$(<VERSION)"
 TAG_NAME="v${VERSION}"
 
@@ -96,5 +104,5 @@ git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
 git push origin "$TAG_NAME"
 
 ./scripts/astro/build.sh
-./scripts/release/package-site.sh
-./scripts/release/create-release.sh
+./scripts/release/package-site.sh --version "$VERSION"
+./scripts/release/create-release.sh --version "$VERSION"
