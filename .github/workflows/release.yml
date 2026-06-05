@@ -10,27 +10,25 @@ on:
         description: Run without committing, tagging, or publishing
         required: false
         default: "false"
+        type: string
       base_branch:
         description: Base branch to compare against
         required: false
         default: main
+        type: string
 
 jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      BASE_BRANCH: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.base_branch || 'main' }}
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run || 'false' }}
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-
-      - name: Detect site changes
-        id: site_changes
-        run: |
-          echo "changed=$(
-            ./scripts/release/detect-changes.sh main | cut -d= -f2
-          )" >> "$GITHUB_OUTPUT"
 
       - name: Make scripts executable
         run: chmod +x scripts/versioning/*.sh scripts/release/*.sh scripts/install/*.sh scripts/astro/*.sh
@@ -41,6 +39,13 @@ jobs:
           ./scripts/install/curl.sh
           ./scripts/install/bump-my-version.sh
           ./scripts/install/gh.sh
+
+      - name: Detect site changes
+        id: site_changes
+        run: |
+          echo "changed=$(
+            ./scripts/release/detect-changes.sh "$BASE_BRANCH" | cut -d= -f2
+          )" >> "$GITHUB_OUTPUT"
 
       - name: Set up Node
         if: steps.site_changes.outputs.changed == 'true'
@@ -69,13 +74,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           DRY_RUN_FLAG=""
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.dry_run }}" == "true" ]]; then
+          if [[ "$DRY_RUN" == "true" ]]; then
             DRY_RUN_FLAG="--dry-run"
-          fi
-
-          BASE_BRANCH="${{ inputs.base_branch }}"
-          if [[ -z "$BASE_BRANCH" ]]; then
-            BASE_BRANCH="main"
           fi
 
           ./scripts/release/release.sh $DRY_RUN_FLAG release --base-branch "$BASE_BRANCH"
