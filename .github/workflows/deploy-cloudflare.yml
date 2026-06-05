@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Version/tag to deploy, like 0.1.0. Defaults to VERSION file.
+        description: Version/tag to deploy, like 0.1.0. Defaults to latest release.
         required: false
         default: ""
         type: string
@@ -46,40 +46,26 @@ jobs:
           ./scripts/install/gh.sh
           ./scripts/install/wrangler.sh
 
-      - name: Resolve version
-        id: version
-        run: |
-          VERSION_INPUT="${{ inputs.version }}"
-
-          if [[ -z "$VERSION_INPUT" ]]; then
-            VERSION_INPUT="$(<VERSION)"
-          fi
-
-          echo "version=$VERSION_INPUT" >> "$GITHUB_OUTPUT"
-          echo "tag=v$VERSION_INPUT" >> "$GITHUB_OUTPUT"
-          echo "asset=site-v$VERSION_INPUT.tar.gz" >> "$GITHUB_OUTPUT"
-
       - name: Deploy to Cloudflare
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_PAGES_PROJECT_PROD: ${{ secrets.CLOUDFLARE_PAGES_PROJECT_PROD }}
-          CLOUDFLARE_PAGES_ROOT_DIR: ${{ secrets.CLOUDFLARE_PAGES_ROOT_DIR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ARGS=(
-            --version "${{ steps.version.outputs.version }}"
-            --tag "${{ steps.version.outputs.tag }}"
-            --asset "${{ steps.version.outputs.asset }}"
-          )
+          ARGS=()
+
+          if [[ -n "${{ inputs.version }}" ]]; then
+            ARGS+=(--version "${{ inputs.version }}")
+          fi
 
           if [[ "${{ inputs.dry_run }}" == "true" ]]; then
-            ARGS=(--dry-run "${ARGS[@]}")
+            ARGS+=(--dry-run)
           fi
 
           if [[ "${{ inputs.force }}" == "true" ]]; then
-            ARGS=(--force "${ARGS[@]}")
+            ARGS+=(--force)
           fi
 
           ./scripts/release/deploy-to-cloudflare.sh "${ARGS[@]}"
