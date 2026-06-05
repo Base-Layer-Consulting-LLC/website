@@ -15,9 +15,9 @@ else
   exit 1
 fi
 
-BASE_REF="$(git merge-base "$BASE_REF" HEAD)"
+MERGE_BASE="$(git merge-base "$BASE_REF" HEAD)"
 
-if git diff --quiet "$BASE_REF" HEAD -- site/; then
+if git diff --quiet "$MERGE_BASE" HEAD -- site/; then
   echo "changed=false"
 else
   echo "changed=true"
