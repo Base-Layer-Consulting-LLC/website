@@ -82,4 +82,4 @@ jobs:
             ARGS=(--force "${ARGS[@]}")
           fi
 
-          ./scripts/release/deploy-cloudflare.sh "${ARGS[@]}"
+          ./scripts/release/deploy-to-cloudflare.sh "${ARGS[@]}"
