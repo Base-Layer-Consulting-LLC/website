@@ -2,6 +2,7 @@ node_modules/
 .astro/
 dist/
 *.tar.gz
+.wrangler/
 
 ## Secrets
 .env
