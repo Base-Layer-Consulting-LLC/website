@@ -13,7 +13,10 @@ import { siteConfig } from "../config/site";
 ---
 
 <ScrollSectionLayout title={siteConfig.name}>
-  <section class="snap-start min-h-dvh flex items-center justify-center px-6">
+  <section
+    id="landing"
+    class="snap-start min-h-dvh flex items-center justify-center px-6"
+  >
     <div class="max-w-5xl text-center space-y-6 flex flex-col items-center">
       <Animate animate="fadeInDown" duration="1.5s">
         <LogoTransparent class="h-32 w-32 sm:h-32 sm:w-32 lg:h-48 lg:w-48" />
@@ -37,10 +40,15 @@ import { siteConfig } from "../config/site";
           <p>{siteConfig.emailMain}</p>
         </div>
       </Animate>
+
+      <Animate animate="jackInTheBox" delay="1.8s">
+        <a href="#contact" class="btn btn-info mt-6"> Let's talk </a>
+      </Animate>
     </div>
   </section>
 
   <section
+    id="services"
     class="snap-start min-h-dvh flex items-start md:items-center justify-center px-6 py-10 md:py-8"
     data-animate-section
   >
@@ -111,6 +119,7 @@ import { siteConfig } from "../config/site";
   </section>
 
   <section
+    id="contact"
     class="snap-start min-h-dvh flex items-center justify-center px-0 sm:px-6 py-6 sm:py-10"
     data-animate-section
   >
