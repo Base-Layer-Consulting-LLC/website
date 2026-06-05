@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "animate.css";
 
 /* Tailwind v4-style plugin config for daisyUI */
 @plugin "daisyui" {
