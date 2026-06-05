@@ -51,30 +51,12 @@ jobs:
           ./scripts/install/bump-my-version.sh
           ./scripts/install/gh.sh
 
-      - name: Set up Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: npm
-          cache-dependency-path: site/package-lock.json
-
-      - name: Install site dependencies
-        working-directory: site
-        run: npm ci
-
-      - name: Configure git identity
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
       - name: Repair missing release
         id: repair_release
         env:
           ASTRO_TELEMETRY_DISABLED: "1"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          INPUT_VERSION: ${{ inputs.version }}
-          INPUT_DRY_RUN: ${{ inputs.dry_run }}
         run: ./scripts/release/repair-release.sh
 
   deploy_cloudflare:

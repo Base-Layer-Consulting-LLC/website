@@ -88,21 +88,17 @@ ARTIFACT_PATH="$(./scripts/release/download-release-artifact.sh "${ARGS[@]}" --o
 
 tar -xzf "$ARTIFACT_PATH" -C "$EXTRACT_DIR"
 
-DEPLOY_DIR="$EXTRACT_DIR"
-if [[ -d "$EXTRACT_DIR/client" && -f "$EXTRACT_DIR/client/index.html" ]]; then
+DEPLOY_DIR=""
+if [[ -f "$EXTRACT_DIR/index.html" ]]; then
+  DEPLOY_DIR="$EXTRACT_DIR"
+elif [[ -d "$EXTRACT_DIR/client" && -f "$EXTRACT_DIR/client/index.html" ]]; then
   DEPLOY_DIR="$EXTRACT_DIR/client"
-fi
-if [[ -d "$EXTRACT_DIR/site/client" && -f "$EXTRACT_DIR/site/client/index.html" ]]; then
+elif [[ -d "$EXTRACT_DIR/site/client" && -f "$EXTRACT_DIR/site/client/index.html" ]]; then
   DEPLOY_DIR="$EXTRACT_DIR/site/client"
 fi
 
-if [[ ! -d "$DEPLOY_DIR" ]]; then
-  echo "[ERROR] Deploy directory not found: $DEPLOY_DIR" >&2
-  exit 1
-fi
-
-if [[ ! -f "$DEPLOY_DIR/index.html" ]]; then
-  echo "[ERROR] index.html not found in deploy directory: $DEPLOY_DIR" >&2
+if [[ -z "$DEPLOY_DIR" ]]; then
+  echo "[ERROR] No deployable directory found in extracted asset" >&2
   exit 1
 fi
 
