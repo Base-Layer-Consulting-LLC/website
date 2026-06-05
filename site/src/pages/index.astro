@@ -4,11 +4,15 @@ import LogoTransparent from "../components/image/logo/LogoTransparent.astro";
 import ContactForm from "../components/forms/ContactForm.astro";
 import Animate from "../components/animate/Animate.astro";
 import ServiceCard from "../components/cards/ServiceCard.astro";
+import { PhRobot } from "phosphor-icons-astro";
+import { PhCloud } from "phosphor-icons-astro";
+import { PhCraneTower } from "phosphor-icons-astro";
+import { PhHeartbeat } from "phosphor-icons-astro";
+import { PhQuestion } from "phosphor-icons-astro";
 import { siteConfig } from "../config/site";
 ---
 
 <ScrollSectionLayout title={siteConfig.name}>
-  <!-- Landing page section -->
   <section class="snap-start min-h-dvh flex items-center justify-center px-6">
     <div class="max-w-5xl text-center space-y-6 flex flex-col items-center">
       <Animate animate="fadeInDown" duration="1.5s">
@@ -36,7 +40,6 @@ import { siteConfig } from "../config/site";
     </div>
   </section>
 
-  <!-- Services section -->
   <section
     class="snap-start min-h-dvh flex items-start md:items-center justify-center px-6 py-10 md:py-8"
     data-animate-section
@@ -64,40 +67,49 @@ import { siteConfig } from "../config/site";
           body="Streamline repetitive tasks and improve workflows with simple, practical automation. Turn pain points into background noise."
           delay="0s"
           class="sm:col-span-1 xl:col-span-2"
-        />
+        >
+          <PhRobot slot="icon" class="h-5 w-5 opacity-80" />
+        </ServiceCard>
 
         <ServiceCard
           title="Cloud & Infrastructure"
           body="Optimize spend by finding over-provisioned resources and ineffeficiencies in your environment. Set up or improve application monitoring and alerting. Feel peace of mind with a good backup strategy for your core infrastructure."
           delay="0.15s"
           class="sm:col-span-1 xl:col-span-2"
-        />
+        >
+          <PhCloud slot="icon" class="h-5 w-5 opacity-80" />
+        </ServiceCard>
 
         <ServiceCard
           title="Platform Engineering"
           body="Improve Developer velocity and experience with GitOps and DevOps. I build platforms, tools, and processes to reduce friction and let Developers do what they do best: build."
           delay="0.3s"
           class="sm:col-span-1 xl:col-span-2"
-        />
+        >
+          <PhCraneTower slot="icon" class="h-5 w-5 opacity-80" />
+        </ServiceCard>
 
         <ServiceCard
           title="Monitoring"
           body="Visibility into systems and services so problems are caught before they become outages. Detect problems in real time, and scope in on where they originated. Let me do the sleuthing while you get back to building."
           delay="0.45s"
           class="sm:col-span-1 xl:col-start-2 xl:col-span-2"
-        />
+        >
+          <PhHeartbeat slot="icon" class="h-5 w-5 opacity-80" />
+        </ServiceCard>
 
         <ServiceCard
           title="Consulting"
           body="Architecture planning, software development lifecycle design, choosing the tools for your trade, and building a stable technical foundation you can grow your business on."
           delay="0.6s"
           class="sm:col-span-1 xl:col-span-2"
-        />
+        >
+          <PhQuestion slot="icon" class="h-5 w-5 opacity-80" />
+        </ServiceCard>
       </div>
     </div>
   </section>
 
-  <!-- Contact section -->
   <section
     class="snap-start min-h-dvh flex items-center justify-center px-0 sm:px-6 py-6 sm:py-10"
     data-animate-section
@@ -123,9 +135,7 @@ import { siteConfig } from "../config/site";
         </div>
       </div>
 
-      <div data-animate-item class="opacity-0">
-        <ContactForm />
-      </div>
+      <ContactForm />
     </div>
   </section>
 

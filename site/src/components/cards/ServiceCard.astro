@@ -28,12 +28,16 @@ const {
   data-duration={duration}
 >
   <div class="card-body">
-    <h3 class="card-title text-lg justify-center text-center">
-      {title}
-    </h3>
-    <p class="text-center justify-center">
-      {body}
-    </p>
+    <div class="flex items-center justify-center gap-2">
+      <slot name="icon" />
+      <h3 class="card-title text-lg justify-center text-center m-0">
+        {title}
+      </h3>
+    </div>
+
+    <hr />
+
+    <p class="text-center justify-center">{body}</p>
   </div>
 
   <script>
