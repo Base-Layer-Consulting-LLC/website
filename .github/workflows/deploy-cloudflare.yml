@@ -50,7 +50,7 @@ on:
         default: false
         type: boolean
       force:
-        description: Ignore release assets and build site/dist directly
+        description: Ignore release assets and build site/dist/client directly
         required: false
         default: false
         type: boolean

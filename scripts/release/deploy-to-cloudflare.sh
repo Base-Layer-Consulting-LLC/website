@@ -59,13 +59,13 @@ if $FORCE; then
   if $DRY_RUN; then
     echo "Dry run: would run npm ci in site/"
     echo "Dry run: would build site"
-    echo "Dry run: would deploy site/dist to Cloudflare Pages"
+    echo "Dry run: would deploy site/dist/client to Cloudflare Pages"
     exit 0
   fi
 
   npm ci --prefix site
   (cd site && npm run build)
-  npx wrangler pages deploy "site/dist" --project-name "$CLOUDFLARE_PAGES_PROJECT_PROD"
+  npx wrangler pages deploy "site/dist/client" --project-name "$CLOUDFLARE_PAGES_PROJECT_PROD"
   exit 0
 fi
 
@@ -88,13 +88,21 @@ ARTIFACT_PATH="$(./scripts/release/download-release-artifact.sh "${ARGS[@]}" --o
 
 tar -xzf "$ARTIFACT_PATH" -C "$EXTRACT_DIR"
 
-DEPLOY_DIR="$EXTRACT_DIR/site"
+DEPLOY_DIR="$EXTRACT_DIR/client"
+if [[ ! -d "$DEPLOY_DIR" ]]; then
+  DEPLOY_DIR="$EXTRACT_DIR/site/client"
+fi
 if [[ ! -d "$DEPLOY_DIR" ]]; then
   DEPLOY_DIR="$EXTRACT_DIR"
 fi
 
 if [[ ! -d "$DEPLOY_DIR" ]]; then
   echo "[ERROR] Deploy directory not found: $DEPLOY_DIR" >&2
+  exit 1
+fi
+
+if [[ ! -f "$DEPLOY_DIR/index.html" ]]; then
+  echo "[ERROR] index.html not found in deploy directory: $DEPLOY_DIR" >&2
   exit 1
 fi
 
