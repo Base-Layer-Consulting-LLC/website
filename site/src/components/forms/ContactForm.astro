@@ -1,10 +1,10 @@
 ---
-import { site } from "../../config/site";
+import { siteConfig } from "../../config/site";
 import { PhPaperPlaneTilt } from "phosphor-icons-astro";
 ---
 
 <form
-  action={`https://formspree.io/f/${site.formspreeContactFormId}`}
+  action={`https://formspree.io/f/${siteConfig.formspreeContactFormId}`}
   method="POST"
   class="space-y-5 sm:space-y-6"
 >

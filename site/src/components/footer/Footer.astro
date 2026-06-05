@@ -1,7 +1,7 @@
 ---
 const year = new Date().getFullYear();
 
-import { site } from "../../config/site";
+import { siteConfig } from "../../config/site";
 ---
 
 <footer class="relative z-0 bg-base-200 border-t w-full">
@@ -10,7 +10,7 @@ import { site } from "../../config/site";
   >
     <p class="opacity-70 md:text-left text-center md:flex-1">
       © {year}
-      {site.name}
+      {siteConfig.name}
     </p>
 
     <p class="opacity-70 md:text-center text-center md:flex-none">
@@ -18,7 +18,7 @@ import { site } from "../../config/site";
     </p>
 
     <p class="opacity-70 text-right whitespace-nowrap md:flex-1">
-      {site.emailMain}
+      {siteConfig.emailMain}
     </p>
   </div>
 </footer>

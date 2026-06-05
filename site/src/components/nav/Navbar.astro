@@ -14,7 +14,7 @@ const pathname = Astro.url.pathname;
 const isActiveLink = (href: string) =>
   href === "/" ? pathname === "/" : pathname.startsWith(href);
 
-import { site } from "../../config/site";
+import { siteConfig } from "../../config/site";
 ---
 
 <div
@@ -49,7 +49,7 @@ import { site } from "../../config/site";
       <NavLogo size={24} />
 
       <span class="font-semibold text-lg whitespace-nowrap">
-        {site.name}
+        {siteConfig.name}
       </span>
     </a>
   </div>
@@ -62,7 +62,7 @@ import { site } from "../../config/site";
       <NavLogo size={24} />
 
       <span class="font-semibold text-sm whitespace-nowrap">
-        {site.name}
+        {siteConfig.name}
       </span>
     </a>
   </div>

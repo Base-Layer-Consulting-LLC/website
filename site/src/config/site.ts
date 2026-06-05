@@ -1,4 +1,5 @@
-export const site = {
+export const siteConfig = {
+    url: import.meta.env.PUBLIC_SITE_ADDR ?? "https://example.com",
     name: import.meta.env.PUBLIC_BUSINESS_NAME ?? "Base Layer Consulting LLC",
     nameShort: import.meta.env.PUBLIC_BUSINESS_NAME_SHORT ?? "Base Layer LLC",
     tagline: import.meta.env.PUBLIC_BUSINESS_TAGLINE ?? "Core infrastructure & platform consulting for your business.",

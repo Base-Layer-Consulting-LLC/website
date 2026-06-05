@@ -1,7 +1,7 @@
 ---
 import { PhEnvelope } from "phosphor-icons-astro";
 
-import { site } from "../../config/site";
+import { siteConfig } from "../../config/site";
 ---
 
 <!-- Floating Button -->
@@ -33,7 +33,7 @@ import { site } from "../../config/site";
 
     <!-- Form -->
     <form
-      action={`https://formspree.io/f/${site.formspreeContactFormId}`}
+      action={`https://formspree.io/f/${siteConfig.formspreeContactFormId}`}
       method="POST"
       class="space-y-4"
     >
