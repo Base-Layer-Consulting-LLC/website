@@ -1,0 +1,68 @@
+---
+interface Props {
+  class?: string;
+  animate?: string;
+  duration?: string;
+  delay?: string;
+  repeat?: string | number;
+  speed?: "fast" | "faster" | "slow" | "slower";
+  timingFunction?: string;
+  direction?: string;
+  fillMode?: string;
+  playState?: string;
+  iterationCount?: string | number;
+  style?: string;
+}
+
+const {
+  class: className = "",
+  animate = "",
+  duration,
+  delay,
+  repeat,
+  speed,
+  timingFunction,
+  direction,
+  fillMode,
+  playState,
+  iterationCount,
+  style = "",
+} = Astro.props;
+
+const delayClassMap: Record<string, string> = {
+  "1s": "animate__delay-1s",
+  "2s": "animate__delay-2s",
+  "3s": "animate__delay-3s",
+  "4s": "animate__delay-4s",
+  "5s": "animate__delay-5s",
+};
+
+const classes = [
+  "animate__animated",
+  animate ? `animate__${animate}` : "",
+  speed ? `animate__${speed}` : "",
+  delay && delayClassMap[delay] ? delayClassMap[delay] : "",
+  repeat === "infinite" ? "animate__infinite" : "",
+  repeat && repeat !== "infinite" ? `animate__repeat-${repeat}` : "",
+  className,
+].filter(Boolean);
+
+const inlineStyle = [
+  duration ? `--animate-duration:${duration}` : "",
+  delay && !delayClassMap[delay] ? `--animate-delay:${delay}` : "",
+  timingFunction ? `animation-timing-function:${timingFunction}` : "",
+  direction ? `animation-direction:${direction}` : "",
+  fillMode ? `animation-fill-mode:${fillMode}` : "",
+  playState ? `animation-play-state:${playState}` : "",
+  iterationCount !== undefined
+    ? `animation-iteration-count:${iterationCount}`
+    : "",
+  style,
+]
+  .filter(Boolean)
+  .join(";");
+---
+
+<div class:list={classes} style={inlineStyle}>
+  <slot />
+</div>
