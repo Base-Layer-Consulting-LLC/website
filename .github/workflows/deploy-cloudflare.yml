@@ -8,6 +8,9 @@ name: Deploy to Cloudflare Pages
 on:
   release:
     types: [published]
+  push:
+    tags:
+      - "v*"
   workflow_dispatch:
     inputs:
       version:
@@ -59,8 +62,11 @@ jobs:
           ARGS=()
 
           if [[ "${{ github.event_name }}" == "release" ]]; then
-            TAG="${{ github.event.release.tag_name }}"
-            ARGS+=(--tag "$TAG")
+            ARGS+=(--tag "${{ github.event.release.tag_name }}")
+          fi
+
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            ARGS+=(--tag "${{ github.ref_name }}")
           fi
 
           if [[ -n "${{ inputs.version }}" ]]; then
