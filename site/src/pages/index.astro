@@ -10,17 +10,17 @@ import { siteConfig } from "../config/site";
   <!-- Landing page section -->
   <section class="snap-start h-dvh flex items-center justify-center px-6">
     <div class="max-w-5xl text-center space-y-6 flex flex-col items-center">
-      <Animate animate="fadeIn" duration="1.5s">
+      <Animate animate="fadeInDown" duration="1.5s">
         <LogoTransparent class="h-32 w-32 sm:h-32 sm:w-32 lg:h-48 lg:w-48" />
       </Animate>
 
-      <Animate animate="zoomInUp" delay="0.5s" duration="1s">
+      <Animate animate="fadeInDown" delay="0.5s" duration="1s">
         <h1 class="text-4xl sm:text-5xl lg:text-7xl font-bold">
           {siteConfig.name}
         </h1>
       </Animate>
 
-      <Animate animate="fadeIn" delay="1s">
+      <Animate animate="fadeInUp" delay="1s">
         <p class="text-lg sm:text-xl opacity-80 pt-3">
           {siteConfig.tagline}
         </p>
