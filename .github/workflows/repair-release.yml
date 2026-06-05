@@ -29,6 +29,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    outputs:
+      version: ${{ steps.repair_release.outputs.version }}
+    env:
+      INPUT_VERSION: ${{ inputs.version }}
+      INPUT_DRY_RUN: ${{ inputs.dry_run }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v6
@@ -63,6 +68,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Repair missing release
+        id: repair_release
         env:
           ASTRO_TELEMETRY_DISABLED: "1"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -70,3 +76,14 @@ jobs:
           INPUT_VERSION: ${{ inputs.version }}
           INPUT_DRY_RUN: ${{ inputs.dry_run }}
         run: ./scripts/release/repair-release.sh
+
+  deploy_cloudflare:
+    needs: repair
+    if: needs.repair.outputs.version != ''
+    uses: ./.github/workflows/deploy-cloudflare.yml
+    with:
+      version: ${{ needs.repair.outputs.version }}
+      tag: v${{ needs.repair.outputs.version }}
+      dry_run: false
+      force: false
+    secrets: inherit

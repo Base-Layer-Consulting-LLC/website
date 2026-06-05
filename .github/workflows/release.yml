@@ -22,6 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    outputs:
+      version: ${{ steps.release_outputs.outputs.version }}
     env:
       BASE_BRANCH: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.base_branch || 'main' }}
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run || 'false' }}
@@ -79,3 +81,20 @@ jobs:
           fi
 
           ./scripts/release/release.sh $DRY_RUN_FLAG release --base-branch "$BASE_BRANCH"
+
+      - name: Export version
+        id: release_outputs
+        if: steps.site_changes.outputs.changed == 'true'
+        run: |
+          echo "version=$(<VERSION)" >> "$GITHUB_OUTPUT"
+
+  deploy_cloudflare:
+    needs: release
+    if: needs.release.outputs.version != ''
+    uses: ./.github/workflows/deploy-cloudflare.yml
+    with:
+      version: ${{ needs.release.outputs.version }}
+      tag: v${{ needs.release.outputs.version }}
+      dry_run: false
+      force: false
+    secrets: inherit

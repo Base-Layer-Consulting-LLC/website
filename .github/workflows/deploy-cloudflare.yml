@@ -6,15 +6,41 @@
 name: Deploy to Cloudflare Pages
 
 on:
-  release:
-    types: [published]
-  push:
-    tags:
-      - "v*"
+  workflow_call:
+    inputs:
+      version:
+        required: false
+        type: string
+        default: ""
+      tag:
+        required: false
+        type: string
+        default: ""
+      dry_run:
+        required: false
+        type: boolean
+        default: false
+      force:
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      CLOUDFLARE_ACCOUNT_ID:
+        required: true
+      CLOUDFLARE_API_TOKEN:
+        required: true
+      CLOUDFLARE_PAGES_PROJECT_PROD:
+        required: true
+
   workflow_dispatch:
     inputs:
       version:
         description: Version/tag to deploy, like 0.1.0. Defaults to latest release.
+        required: false
+        default: ""
+        type: string
+      tag:
+        description: Explicit tag to deploy, like v0.1.0.
         required: false
         default: ""
         type: string
@@ -61,12 +87,8 @@ jobs:
         run: |
           ARGS=()
 
-          if [[ "${{ github.event_name }}" == "release" ]]; then
-            ARGS+=(--tag "${{ github.event.release.tag_name }}")
-          fi
-
-          if [[ "${{ github.event_name }}" == "push" ]]; then
-            ARGS+=(--tag "${{ github.ref_name }}")
+          if [[ -n "${{ inputs.tag }}" ]]; then
+            ARGS+=(--tag "${{ inputs.tag }}")
           fi
 
           if [[ -n "${{ inputs.version }}" ]]; then
