@@ -88,12 +88,12 @@ ARTIFACT_PATH="$(./scripts/release/download-release-artifact.sh "${ARGS[@]}" --o
 
 tar -xzf "$ARTIFACT_PATH" -C "$EXTRACT_DIR"
 
-DEPLOY_DIR="$EXTRACT_DIR/client"
-if [[ ! -d "$DEPLOY_DIR" ]]; then
-  DEPLOY_DIR="$EXTRACT_DIR/site/client"
+DEPLOY_DIR="$EXTRACT_DIR"
+if [[ -d "$EXTRACT_DIR/client" && -f "$EXTRACT_DIR/client/index.html" ]]; then
+  DEPLOY_DIR="$EXTRACT_DIR/client"
 fi
-if [[ ! -d "$DEPLOY_DIR" ]]; then
-  DEPLOY_DIR="$EXTRACT_DIR"
+if [[ -d "$EXTRACT_DIR/site/client" && -f "$EXTRACT_DIR/site/client/index.html" ]]; then
+  DEPLOY_DIR="$EXTRACT_DIR/site/client"
 fi
 
 if [[ ! -d "$DEPLOY_DIR" ]]; then
