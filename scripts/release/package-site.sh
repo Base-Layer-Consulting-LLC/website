@@ -2,7 +2,7 @@
 set -euo pipefail
 
 #######################################################################
-# Copy VERSION file into site/dist, then create .tar.gz archive        #
+# Copy VERSION file into the dist root, then create .tar.gz archive   #
 #######################################################################
 
 DRY_RUN=false
@@ -57,6 +57,7 @@ fi
 
 rm -rf "$TMP_BUILD_DIR"
 mkdir -p "$TMP_BUILD_DIR"
+
 cp -R "$BUILD_DIR"/. "$TMP_BUILD_DIR"/
 cp "${REPO_ROOT}/VERSION" "${TMP_BUILD_DIR}/VERSION"
 
