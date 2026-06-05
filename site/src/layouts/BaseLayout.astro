@@ -9,9 +9,9 @@ interface Props {
   title?: string;
 }
 
-import { site } from "../config/site";
+import { siteConfig } from "../config/site";
 
-const { title = site.name } = Astro.props;
+const { title = siteConfig.name } = Astro.props;
 ---
 
 <!doctype html>
