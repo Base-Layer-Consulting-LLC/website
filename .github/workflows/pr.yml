@@ -15,6 +15,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Detect site changes
+        id: site_changes
+        run: |
+          echo "changed=$(
+            ./scripts/release/detect-changes.sh main | cut -d= -f2
+          )" >> "$GITHUB_OUTPUT"
+
       - name: Make scripts executable
         run: chmod +x scripts/versioning/*.sh scripts/release/*.sh scripts/install/*.sh scripts/astro/*.sh
 
@@ -26,6 +33,7 @@ jobs:
           ./scripts/install/gh.sh
 
       - name: Set up Node
+        if: steps.site_changes.outputs.changed == 'true'
         uses: actions/setup-node@v6
         with:
           node-version: 24
@@ -33,10 +41,12 @@ jobs:
           cache-dependency-path: site/package-lock.json
 
       - name: Install site dependencies
+        if: steps.site_changes.outputs.changed == 'true'
         working-directory: site
         run: npm ci
 
       - name: Run PR release check
+        if: steps.site_changes.outputs.changed == 'true'
         env:
           ASTRO_TELEMETRY_DISABLED: "1"
         run: ./scripts/release/release.sh pr --base-branch main
