@@ -3,6 +3,7 @@ import ScrollSectionLayout from "../layouts/ScrollSectionLayout.astro";
 import LogoTransparent from "../components/image/logo/LogoTransparent.astro";
 import ContactForm from "../components/forms/ContactForm.astro";
 import Animate from "../components/animate/Animate.astro";
+import ServiceCard from "../components/cards/ServiceCard.astro";
 import { siteConfig } from "../config/site";
 ---
 
@@ -58,76 +59,40 @@ import { siteConfig } from "../config/site";
       </div>
 
       <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
-        <div
-          data-animate-item
-          class="opacity-0 card bg-base-200 shadow-sm text-left sm:col-span-1 xl:col-span-2"
-        >
-          <div class="card-body">
-            <h3 class="card-title text-lg">Automation</h3>
-            <p>
-              Streamline repetitive tasks and improve workflows with simple,
-              practical automation. Turn pain points into background noise.
-            </p>
-          </div>
-        </div>
+        <ServiceCard
+          title="Automation"
+          body="Streamline repetitive tasks and improve workflows with simple, practical automation. Turn pain points into background noise."
+          delay="0s"
+          class="sm:col-span-1 xl:col-span-2"
+        />
 
-        <div
-          data-animate-item
-          class="opacity-0 card bg-base-200 shadow-sm text-left sm:col-span-1 xl:col-span-2"
-        >
-          <div class="card-body">
-            <h3 class="card-title text-lg">Cloud & Infrastructure</h3>
-            <p>
-              Optimize spend by finding over-provisioned resources and
-              ineffeficiencies in your environment. Set up or improve
-              application monitoring and alerting. Feel peace of mind with a
-              good backup strategy for your core infrastructure.
-            </p>
-          </div>
-        </div>
+        <ServiceCard
+          title="Cloud & Infrastructure"
+          body="Optimize spend by finding over-provisioned resources and ineffeficiencies in your environment. Set up or improve application monitoring and alerting. Feel peace of mind with a good backup strategy for your core infrastructure."
+          delay="0.15s"
+          class="sm:col-span-1 xl:col-span-2"
+        />
 
-        <div
-          data-animate-item
-          class="opacity-0 card bg-base-200 shadow-sm text-left sm:col-span-1 xl:col-span-2"
-        >
-          <div class="card-body">
-            <h3 class="card-title text-lg">Platform Engineering</h3>
-            <p>
-              Improve Developer velocity and experience with GitOps and DevOps.
-              I build platforms, tools, and processes to reduce friction and let
-              Developers do what they do best: build.
-            </p>
-          </div>
-        </div>
+        <ServiceCard
+          title="Platform Engineering"
+          body="Improve Developer velocity and experience with GitOps and DevOps. I build platforms, tools, and processes to reduce friction and let Developers do what they do best: build."
+          delay="0.3s"
+          class="sm:col-span-1 xl:col-span-2"
+        />
 
-        <div
-          data-animate-item
-          class="opacity-0 card bg-base-200 shadow-sm text-left sm:col-span-1 xl:col-start-2 xl:col-span-2"
-        >
-          <div class="card-body">
-            <h3 class="card-title text-lg">Monitoring</h3>
-            <p>
-              Visibility into systems and services so problems are caught before
-              they become outages. Detect problems in real time, and scope in on
-              where they originated. Let me do the sleuthing while you get back
-              to building.
-            </p>
-          </div>
-        </div>
+        <ServiceCard
+          title="Monitoring"
+          body="Visibility into systems and services so problems are caught before they become outages. Detect problems in real time, and scope in on where they originated. Let me do the sleuthing while you get back to building."
+          delay="0.45s"
+          class="sm:col-span-1 xl:col-start-2 xl:col-span-2"
+        />
 
-        <div
-          data-animate-item
-          class="opacity-0 card bg-base-200 shadow-sm text-left sm:col-span-1 xl:col-span-2"
-        >
-          <div class="card-body">
-            <h3 class="card-title text-lg">Consulting</h3>
-            <p>
-              Architecture planning, software development lifecycle design,
-              choosing the tools for your trade, and building a stable technical
-              foundation you can grow your business on.
-            </p>
-          </div>
-        </div>
+        <ServiceCard
+          title="Consulting"
+          body="Architecture planning, software development lifecycle design, choosing the tools for your trade, and building a stable technical foundation you can grow your business on."
+          delay="0.6s"
+          class="sm:col-span-1 xl:col-span-2"
+        />
       </div>
     </div>
   </section>
