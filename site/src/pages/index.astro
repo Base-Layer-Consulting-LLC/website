@@ -115,7 +115,8 @@ import { siteConfig } from "../config/site";
     data-animate-section
   >
     <div
-      class="w-full max-w-none sm:max-w-2xl rounded-none sm:rounded-3xl border border-base-300 bg-base-100/80 p-4 sm:p-8 shadow-none sm:shadow-xl"
+      data-animate-item
+      class="opacity-0 w-full max-w-none sm:max-w-2xl rounded-none sm:rounded-3xl border border-base-300 bg-base-100/80 p-4 sm:p-8 shadow-none sm:shadow-xl"
     >
       <div class="text-center space-y-4 mb-6 sm:mb-8">
         <div data-animate-item class="opacity-0">
@@ -135,7 +136,9 @@ import { siteConfig } from "../config/site";
         </div>
       </div>
 
-      <ContactForm />
+      <div data-animate-item class="opacity-0">
+        <ContactForm />
+      </div>
     </div>
   </section>
 
