@@ -1,0 +1,131 @@
+---
+interface Props {
+  class?: string;
+  animate?: string;
+  duration?: string;
+  delay?: string;
+  repeat?: string | number;
+  speed?: "fast" | "faster" | "slow" | "slower";
+  timingFunction?: string;
+  direction?: string;
+  fillMode?: string;
+  playState?: string;
+  iterationCount?: string | number;
+  style?: string;
+  onView?: boolean;
+  threshold?: number;
+  rootMargin?: string;
+}
+
+const {
+  class: className = "",
+  animate = "",
+  duration,
+  delay,
+  repeat,
+  speed,
+  timingFunction,
+  direction,
+  fillMode,
+  playState,
+  iterationCount,
+  style = "",
+  onView = false,
+  threshold = 0.25,
+  rootMargin = "0px 0px -10% 0px",
+} = Astro.props;
+
+const delayClassMap: Record<string, string> = {
+  "1s": "animate__delay-1s",
+  "2s": "animate__delay-2s",
+  "3s": "animate__delay-3s",
+  "4s": "animate__delay-4s",
+  "5s": "animate__delay-5s",
+};
+
+const classes = [
+  "animate__animated",
+  animate ? `animate__${animate}` : "",
+  speed ? `animate__${speed}` : "",
+  delay && delayClassMap[delay] ? delayClassMap[delay] : "",
+  repeat === "infinite" ? "animate__infinite" : "",
+  repeat && repeat !== "infinite" ? `animate__repeat-${repeat}` : "",
+  onView ? "animate-on-view" : "",
+  className,
+].filter(Boolean);
+
+const inlineStyle = [
+  duration ? `animation-duration:${duration};--animate-duration:${duration}` : "",
+  delay ? `animation-delay:${delay};--animate-delay:${delay}` : "",
+  timingFunction ? `animation-timing-function:${timingFunction}` : "",
+  direction ? `animation-direction:${direction}` : "",
+  fillMode ? `animation-fill-mode:${fillMode}` : "",
+  playState ? `animation-play-state:${playState}` : "",
+  iterationCount !== undefined ? `animation-iteration-count:${iterationCount}` : "",
+  style,
+]
+  .filter(Boolean)
+  .join(";");
+---
+
+<div class:list={classes} style={inlineStyle} {...(onView ? {
+  "data-animate-on-view": "true",
+  "data-animate-threshold": String(threshold),
+  "data-animate-root-margin": rootMargin,
+  "data-animate-name": animate,
+  "data-animate-delay": delay ?? "",
+  "data-animate-duration": duration ?? "",
+} : {})}>
+  <slot />
+</div>
+
+{onView && (
+  <script is:inline>
+    (() => {
+      const nodes = document.querySelectorAll('[data-animate-on-view="true"]');
+      if (!nodes.length || !("IntersectionObserver" in window)) return;
+
+      const byOptions = new Map();
+
+      nodes.forEach((node) => {
+        node.classList.add("opacity-0");
+        const threshold = Number(node.dataset.animateThreshold || "0.25");
+        const rootMargin = node.dataset.animateRootMargin || "0px 0px -10% 0px";
+        const key = `${threshold}|${rootMargin}`;
+
+        if (!byOptions.has(key)) {
+          byOptions.set(
+            key,
+            new IntersectionObserver((entries, obs) => {
+              entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+
+                const el = entry.target;
+                el.classList.remove("opacity-0");
+                el.classList.add("animate__animated");
+                const name = el.dataset.animateName;
+                if (name) el.classList.add(`animate__${name}`);
+
+                const delay = el.dataset.animateDelay;
+                const duration = el.dataset.animateDuration;
+
+                if (delay) {
+                  el.style.setProperty("animation-delay", delay);
+                  el.style.setProperty("--animate-delay", delay);
+                }
+                if (duration) {
+                  el.style.setProperty("animation-duration", duration);
+                  el.style.setProperty("--animate-duration", duration);
+                }
+
+                obs.unobserve(el);
+              });
+            }, { threshold, rootMargin })
+          );
+        }
+
+        byOptions.get(key).observe(node);
+      });
+    })();
+  </script>
+)}
