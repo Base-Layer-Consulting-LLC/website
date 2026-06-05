@@ -58,7 +58,7 @@ if [[ "$MODE" == "release" && "$DRY_RUN" == false ]]; then
   fi
 fi
 
-BUMPTYPE="$(./scripts/versioning/detect-bump.sh "$BASE_BRANCH" || true)"
+BUMPTYPE="$(./scripts/versioning/detect-bump.sh "$BASE_BRANCH")"
 if [[ -z "$BUMPTYPE" ]]; then
   echo "No version bump required"
   exit 0
