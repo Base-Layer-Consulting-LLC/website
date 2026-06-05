@@ -65,10 +65,7 @@ if $FORCE; then
 
   npm ci --prefix site
   (cd site && npm run build)
-
-  npx wrangler pages deploy "site/dist" \
-    --project-name "$CLOUDFLARE_PAGES_PROJECT_PROD" \
-    --account-id "$CLOUDFLARE_ACCOUNT_ID"
+  npx wrangler pages deploy "site/dist" --project-name "$CLOUDFLARE_PAGES_PROJECT_PROD"
   exit 0
 fi
 
@@ -85,7 +82,6 @@ ARTIFACT_PATH="$(./scripts/release/download-release-artifact.sh \
 tar -xzf "$ARTIFACT_PATH" -C "$EXTRACT_DIR"
 
 DEPLOY_DIR="$EXTRACT_DIR/site-v${VERSION:-${TAG_NAME#v}}"
-
 if [[ ! -d "$DEPLOY_DIR" ]]; then
   DEPLOY_DIR="$EXTRACT_DIR"
 fi
@@ -100,6 +96,4 @@ if $DRY_RUN; then
   exit 0
 fi
 
-npx wrangler pages deploy "$DEPLOY_DIR" \
-  --project-name "$CLOUDFLARE_PAGES_PROJECT_PROD" \
-  --account-id "$CLOUDFLARE_ACCOUNT_ID"
+npx wrangler pages deploy "$DEPLOY_DIR" --project-name "$CLOUDFLARE_PAGES_PROJECT_PROD"
