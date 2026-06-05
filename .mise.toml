@@ -1,0 +1,8 @@
+[tools]
+direnv = "latest"
+astro = "latest"
+gh = "latest"
+pipx = "latest"
+node = "24"
+npm = "latest"
+wrangler = "latest"
