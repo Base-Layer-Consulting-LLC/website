@@ -1,0 +1,85 @@
+---
+##########################################################
+# Deploy latest Github release asset to Cloudflare Pages #
+##########################################################
+
+name: Deploy to Cloudflare Pages
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version/tag to deploy, like 0.1.0. Defaults to VERSION file.
+        required: false
+        default: ""
+        type: string
+      dry_run:
+        description: Run without deploying anything
+        required: false
+        default: false
+        type: boolean
+      force:
+        description: Ignore release assets and build site/dist directly
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Make scripts executable
+        run: chmod +x scripts/versioning/*.sh scripts/release/*.sh scripts/install/*.sh scripts/astro/*.sh
+
+      - name: Install required tools
+        run: |
+          ./scripts/install/git.sh
+          ./scripts/install/curl.sh
+          ./scripts/install/node.sh
+          ./scripts/install/gh.sh
+          ./scripts/install/wrangler.sh
+
+      - name: Resolve version
+        id: version
+        run: |
+          VERSION_INPUT="${{ inputs.version }}"
+
+          if [[ -z "$VERSION_INPUT" ]]; then
+            VERSION_INPUT="$(<VERSION)"
+          fi
+
+          echo "version=$VERSION_INPUT" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION_INPUT" >> "$GITHUB_OUTPUT"
+          echo "asset=site-v$VERSION_INPUT.tar.gz" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy to Cloudflare
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_PAGES_PROJECT_PROD: ${{ secrets.CLOUDFLARE_PAGES_PROJECT_PROD }}
+          CLOUDFLARE_PAGES_ROOT_DIR: ${{ secrets.CLOUDFLARE_PAGES_ROOT_DIR }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ARGS=(
+            --version "${{ steps.version.outputs.version }}"
+            --tag "${{ steps.version.outputs.tag }}"
+            --asset "${{ steps.version.outputs.asset }}"
+          )
+
+          if [[ "${{ inputs.dry_run }}" == "true" ]]; then
+            ARGS=(--dry-run "${ARGS[@]}")
+          fi
+
+          if [[ "${{ inputs.force }}" == "true" ]]; then
+            ARGS=(--force "${ARGS[@]}")
+          fi
+
+          ./scripts/release/deploy-cloudflare.sh "${ARGS[@]}"
