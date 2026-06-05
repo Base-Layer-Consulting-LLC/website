@@ -72,50 +72,32 @@ if $FORCE; then
   exit 0
 fi
 
-if [[ -z "$VERSION" && -z "$TAG_NAME" ]]; then
-  VERSION="$(<VERSION)"
-fi
-
-if [[ -z "$TAG_NAME" ]]; then
-  TAG_NAME="v${VERSION}"
-fi
-
-if [[ -z "$VERSION" ]]; then
-  VERSION="${TAG_NAME#v}"
-fi
-
-if [[ -z "$ASSET_NAME" ]]; then
-  ASSET_NAME="site-${TAG_NAME}.tar.gz"
-fi
-
-LATEST_TAG="$(gh release list --limit 1 --json tagName,isLatest --jq '.[] | select(.isLatest) | .tagName' 2>/dev/null || true)"
-
-if $DRY_RUN; then
-  echo "Requested tag: ${TAG_NAME}"
-  if [[ -n "$LATEST_TAG" && "$LATEST_TAG" != "$TAG_NAME" ]]; then
-    echo "Dry run: newer/latest release exists: ${LATEST_TAG}"
-    echo "Dry run: would deploy asset for latest release instead: site-${LATEST_TAG}.tar.gz"
-  else
-    echo "Dry run: would deploy asset: ${ASSET_NAME}"
-  fi
-  exit 0
-fi
-
 DOWNLOAD_DIR="$(mktemp -d)"
 EXTRACT_DIR="$(mktemp -d)"
 trap 'rm -rf "$DOWNLOAD_DIR" "$EXTRACT_DIR"' EXIT
 
-gh release download "$TAG_NAME" --pattern "$ASSET_NAME" --dir "$DOWNLOAD_DIR"
-tar -xzf "${DOWNLOAD_DIR}/${ASSET_NAME}" -C "$EXTRACT_DIR"
+ARTIFACT_PATH="$(./scripts/release/download-release-artifact.sh \
+  ${VERSION:+--version "$VERSION"} \
+  ${TAG_NAME:+--tag "$TAG_NAME"} \
+  ${ASSET_NAME:+--asset "$ASSET_NAME"} \
+  --output-dir "$DOWNLOAD_DIR")"
 
-DEPLOY_DIR="$EXTRACT_DIR"
-if [[ -n "${CLOUDFLARE_PAGES_ROOT_DIR:-}" ]]; then
-  DEPLOY_DIR="${EXTRACT_DIR}/${CLOUDFLARE_PAGES_ROOT_DIR}"
+tar -xzf "$ARTIFACT_PATH" -C "$EXTRACT_DIR"
+
+DEPLOY_DIR="$EXTRACT_DIR/site-v${VERSION:-${TAG_NAME#v}}"
+
+if [[ ! -d "$DEPLOY_DIR" ]]; then
+  DEPLOY_DIR="$EXTRACT_DIR"
 fi
 
 if [[ ! -d "$DEPLOY_DIR" ]]; then
   echo "[ERROR] Deploy directory not found: $DEPLOY_DIR" >&2
   exit 1
+fi
+
+if $DRY_RUN; then
+  echo "Dry run: would deploy $DEPLOY_DIR to Cloudflare Pages"
+  exit 0
 fi
 
 npx wrangler pages deploy "$DEPLOY_DIR" \
