@@ -73,15 +73,22 @@ DOWNLOAD_DIR="$(mktemp -d)"
 EXTRACT_DIR="$(mktemp -d)"
 trap 'rm -rf "$DOWNLOAD_DIR" "$EXTRACT_DIR"' EXIT
 
-ARTIFACT_PATH="$(./scripts/release/download-release-artifact.sh \
-  ${VERSION:+--version "$VERSION"} \
-  ${TAG_NAME:+--tag "$TAG_NAME"} \
-  ${ASSET_NAME:+--asset "$ASSET_NAME"} \
-  --output-dir "$DOWNLOAD_DIR")"
+ARGS=()
+if [[ -n "$VERSION" ]]; then
+  ARGS+=(--version "$VERSION")
+fi
+if [[ -n "$TAG_NAME" ]]; then
+  ARGS+=(--tag "$TAG_NAME")
+fi
+if [[ -n "$ASSET_NAME" ]]; then
+  ARGS+=(--asset "$ASSET_NAME")
+fi
+
+ARTIFACT_PATH="$(./scripts/release/download-release-artifact.sh "${ARGS[@]}" --output-dir "$DOWNLOAD_DIR")"
 
 tar -xzf "$ARTIFACT_PATH" -C "$EXTRACT_DIR"
 
-DEPLOY_DIR="$EXTRACT_DIR/site-v${VERSION:-${TAG_NAME#v}}"
+DEPLOY_DIR="$EXTRACT_DIR/site"
 if [[ ! -d "$DEPLOY_DIR" ]]; then
   DEPLOY_DIR="$EXTRACT_DIR"
 fi
