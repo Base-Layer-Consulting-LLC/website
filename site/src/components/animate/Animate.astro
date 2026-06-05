@@ -55,8 +55,8 @@ const classes = [
 ].filter(Boolean);
 
 const inlineStyle = [
-  duration ? `--animate-duration:${duration}` : "",
-  delay && !delayClassMap[delay] ? `--animate-delay:${delay}` : "",
+  duration ? `animation-duration:${duration};--animate-duration:${duration}` : "",
+  delay ? `animation-delay:${delay};--animate-delay:${delay}` : "",
   timingFunction ? `animation-timing-function:${timingFunction}` : "",
   direction ? `animation-direction:${direction}` : "",
   fillMode ? `animation-fill-mode:${fillMode}` : "",
@@ -66,24 +66,16 @@ const inlineStyle = [
 ]
   .filter(Boolean)
   .join(";");
-
-const dataAttrs = onView
-  ? {
-      "data-animate-on-view": "true",
-      "data-animate-threshold": String(threshold),
-      "data-animate-root-margin": rootMargin,
-      "data-animate-name": animate,
-      "data-animate-delay": delay ?? "",
-      "data-animate-duration": duration ?? "",
-    }
-  : {};
 ---
 
-<div
-  class:list={classes}
-  style={inlineStyle}
-  {...dataAttrs}
->
+<div class:list={classes} style={inlineStyle} {...(onView ? {
+  "data-animate-on-view": "true",
+  "data-animate-threshold": String(threshold),
+  "data-animate-root-margin": rootMargin,
+  "data-animate-name": animate,
+  "data-animate-delay": delay ?? "",
+  "data-animate-duration": duration ?? "",
+} : {})}>
   <slot />
 </div>
 
@@ -117,8 +109,14 @@ const dataAttrs = onView
                 const delay = el.dataset.animateDelay;
                 const duration = el.dataset.animateDuration;
 
-                if (delay) el.style.setProperty("--animate-delay", delay);
-                if (duration) el.style.setProperty("--animate-duration", duration);
+                if (delay) {
+                  el.style.setProperty("animation-delay", delay);
+                  el.style.setProperty("--animate-delay", delay);
+                }
+                if (duration) {
+                  el.style.setProperty("animation-duration", duration);
+                  el.style.setProperty("--animate-duration", duration);
+                }
 
                 obs.unobserve(el);
               });
