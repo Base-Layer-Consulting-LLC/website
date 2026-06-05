@@ -39,4 +39,38 @@
     }
 }
 
-/* Custom CSS */
+/*
+    Custom CSS
+*/
+
+/* Fix animations on Safari */
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    .animate__animated {
+        animation-duration: 0.35s !important;
+        animation-timing-function: ease-out !important;
+    }
+
+    .animate__animated.animate__fadeInDown,
+    .animate__animated.animate__fadeInUp,
+    .animate__animated.animate__jackInTheBox,
+    .animate__animated.animate__fadeIn {
+        animation-name: fadeIn !important;
+    }
+
+    .animate__animated.animate__fadeInUp {
+        transform: none !important;
+    }
+
+    .animate__animated.animate__fadeInDown {
+        transform: none !important;
+    }
+
+    .animate__animated.animate__jackInTheBox {
+        transform: none !important;
+    }
+}
