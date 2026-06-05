@@ -9,43 +9,50 @@ ROOT_DIR="$(git rev-parse --show-toplevel)"
 cd "$ROOT_DIR"
 
 VERSION="${INPUT_VERSION:-}"
+DRY_RUN="${INPUT_DRY_RUN:-false}"
+TAG_NAME=""
+ASSET_NAME=""
 
 if [[ -z "$VERSION" ]]; then
   VERSION="$(<VERSION)"
 fi
 
-DRY_RUN="${INPUT_DRY_RUN:-false}"
 TAG_NAME="v${VERSION}"
-RELEASE_NAME="site-v${VERSION}"
-ARCHIVE_NAME="site-v${VERSION}.tar.gz"
+ASSET_NAME="site-v${VERSION}.tar.gz"
 
-if [[ "$DRY_RUN" == "true" ]]; then
-  echo "Would repair missing release for ${TAG_NAME}"
+function emit_version() {
   if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
     echo "version=$VERSION" >>"$GITHUB_OUTPUT"
   else
     echo "version=$VERSION"
   fi
+}
+
+if [[ "$DRY_RUN" == "true" ]]; then
+  echo "Would repair release for ${TAG_NAME}"
+  emit_version
   exit 0
 fi
 
+if ! gh release view "$TAG_NAME" >/dev/null 2>&1; then
+  echo "Release ${TAG_NAME} does not exist."
+fi
+
+if [[ ! -f "$ASSET_NAME" ]]; then
+  echo "Missing asset ${ASSET_NAME}; building it now."
+
+  npm ci --prefix site
+  (cd site && npm run build)
+
+  ./scripts/release/package-site.sh --version "$VERSION"
+fi
+
 if gh release view "$TAG_NAME" >/dev/null 2>&1; then
-  echo "Release already exists for ${TAG_NAME}"
+  gh release upload "$TAG_NAME" "$ASSET_NAME" --clobber
 else
-  if [[ ! -f "${ROOT_DIR}/${ARCHIVE_NAME}" ]]; then
-    echo "[ERROR] Missing asset: ${ARCHIVE_NAME}" >&2
-    exit 1
-  fi
-
-  gh release create "$TAG_NAME" "${ROOT_DIR}/${ARCHIVE_NAME}" \
-    --title "$RELEASE_NAME" \
-    --notes "Release ${RELEASE_NAME}"
-
-  echo "Created release ${TAG_NAME}"
+  gh release create "$TAG_NAME" "$ASSET_NAME" \
+    --title "site-v${VERSION}" \
+    --notes "Release site-v${VERSION}"
 fi
 
-if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
-  echo "version=$VERSION" >>"$GITHUB_OUTPUT"
-else
-  echo "version=$VERSION"
-fi
+emit_version
