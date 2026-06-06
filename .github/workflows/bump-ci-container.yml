@@ -6,6 +6,10 @@
 name: Bump CI container
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - .containers/ci/**
   workflow_dispatch: {}
 
 jobs:
