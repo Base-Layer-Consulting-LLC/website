@@ -1,6 +1,10 @@
-ARG ALPINE_IMG=3.22.4
+# syntax=docker/dockerfile:1
 
+ARG ALPINE_IMG=3.22.4
 FROM alpine:${ALPINE_IMG} AS base
+
+ARG IMAGE_SOURCE=""
+LABEL org.opencontainers.image.source="${IMAGE_SOURCE}"
 
 RUN apk add --no-cache \
     bash \
