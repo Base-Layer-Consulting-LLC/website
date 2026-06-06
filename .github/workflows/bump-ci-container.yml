@@ -27,6 +27,10 @@ jobs:
       - name: Make scripts executable
         run: chmod +x scripts/docker/*.sh
 
+      - name: Install bump-my-version
+        run: |
+          ./scripts/install/bump-my-version.sh
+
       - name: Configure git identity
         run: |
           git config --global user.name "github-actions[bot]"
