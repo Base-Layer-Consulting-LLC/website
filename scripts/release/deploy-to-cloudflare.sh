@@ -65,7 +65,7 @@ if $FORCE; then
 
   npm ci --prefix site
   (cd site && npm run build)
-  npx wrangler pages deploy "site/dist/client" --project-name "$CLOUDFLARE_PAGES_PROJECT_PROD"
+  npx wrangler pages deploy "site/dist" --project-name "$CLOUDFLARE_PAGES_PROJECT_PROD"
   exit 0
 fi
 
@@ -91,10 +91,9 @@ tar -xzf "$ARTIFACT_PATH" -C "$EXTRACT_DIR"
 DEPLOY_DIR=""
 if [[ -f "$EXTRACT_DIR/index.html" ]]; then
   DEPLOY_DIR="$EXTRACT_DIR"
-elif [[ -d "$EXTRACT_DIR/client" && -f "$EXTRACT_DIR/client/index.html" ]]; then
-  DEPLOY_DIR="$EXTRACT_DIR/client"
-elif [[ -d "$EXTRACT_DIR/site/client" && -f "$EXTRACT_DIR/site/client/index.html" ]]; then
-  DEPLOY_DIR="$EXTRACT_DIR/site/client"
+else
+  echo "[ERROR] No deployable directory found in extracted asset" >&2
+  exit 1
 fi
 
 if [[ -z "$DEPLOY_DIR" ]]; then
