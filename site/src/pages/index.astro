@@ -17,7 +17,7 @@ import { siteConfig } from "../config/site";
   <!-- Landing section -->
   <section
     id="landing"
-    class="snap-start min-h-dvh flex items-center justify-center px-6"
+    class="snap-start min-h-dvh flex items-center justify-center px-6 relative"
   >
     <div class="max-w-5xl text-center space-y-6 flex flex-col items-center">
       <Animate animate="fadeInDown" duration="1.5s">
@@ -48,11 +48,11 @@ import { siteConfig } from "../config/site";
       </Animate>
 
       <!-- Scroll down indicator -->
-      <Animate animate="fadeInUp" duration="1s" delay="2s" onView={true}>
-        <div class="pt-10">
+      <div class="absolute bottom-6 left-1/2 -translate-x-1/2">
+        <Animate animate="fadeInUp" duration="1s" delay="2s" onView={true}>
           <ScrollIndicator href="#services" />
-        </div>
-      </Animate>
+        </Animate>
+      </div>
     </div>
   </section>
 
