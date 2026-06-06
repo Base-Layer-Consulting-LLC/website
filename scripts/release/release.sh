@@ -9,7 +9,7 @@ DRY_RUN=false
 MODE=""
 BASE_BRANCH="main"
 
-usage() {
+function usage() {
   cat <<EOF
 Usage:
   $0 [--dry-run] <pr|release> [--base-branch <branch>]
@@ -49,6 +49,11 @@ fi
 
 ROOT_DIR="$(git rev-parse --show-toplevel)"
 cd "$ROOT_DIR"
+
+## Default outputs
+if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+  echo "released=false" >>"$GITHUB_OUTPUT"
+fi
 
 ## Skip logic for release commits
 if [[ "$MODE" == "release" && "$DRY_RUN" == false ]]; then
@@ -111,11 +116,13 @@ TAG_NAME="v${VERSION}"
 echo "Releasing $TAG_NAME"
 
 ## Build site
-npm ci --prefix site
 (cd site && npm run build)
 
 ## Validate build output
-test -f site/dist/index.html
+if [[ ! -f site/dist/index.html ]]; then
+  echo "[ERROR] Astro build output missing" >&2
+  exit 1
+fi
 
 ## Git commit + tag
 git config user.name "github-actions[bot]"
@@ -131,3 +138,11 @@ git push origin "$TAG_NAME"
 ## Package + publish
 ./scripts/release/package-site.sh --version "$VERSION"
 ./scripts/release/create-release.sh --version "$VERSION"
+
+## Export release metadata
+if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+  {
+    echo "released=true"
+    echo "version=$VERSION"
+  } >>"$GITHUB_OUTPUT"
+fi
