@@ -4,6 +4,7 @@ import LogoTransparent from "../components/image/logo/LogoTransparent.astro";
 import ContactForm from "../components/forms/ContactForm.astro";
 import Animate from "../components/animate/Animate.astro";
 import ServiceCard from "../components/cards/ServiceCard.astro";
+import ScrollIndicator from "../components/ui/ScrollIndicator.astro";
 import { PhRobot } from "phosphor-icons-astro";
 import { PhCloud } from "phosphor-icons-astro";
 import { PhCraneTower } from "phosphor-icons-astro";
@@ -13,6 +14,7 @@ import { siteConfig } from "../config/site";
 ---
 
 <ScrollSectionLayout title={siteConfig.name}>
+  <!-- Landing section -->
   <section
     id="landing"
     class="snap-start min-h-dvh flex items-center justify-center px-6"
@@ -44,9 +46,17 @@ import { siteConfig } from "../config/site";
       <Animate animate="fadeIn" delay="1.8s">
         <a href="#contact" class="btn btn-info mt-6"> Let's talk </a>
       </Animate>
+
+      <!-- Scroll down indicator -->
+      <Animate animate="fadeInUp" duration="1s" delay="2s" onView={true}>
+        <div class="pt-10">
+          <ScrollIndicator href="#services" />
+        </div>
+      </Animate>
     </div>
   </section>
 
+  <!-- Services section -->
   <section
     id="services"
     class="snap-start min-h-dvh flex items-start md:items-center justify-center px-6 py-10 md:py-8"
