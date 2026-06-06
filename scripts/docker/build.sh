@@ -21,4 +21,13 @@ ci)
   ;;
 esac
 
-docker build -f "$DOCKERFILE" -t "$TAG" "$CONTEXT"
+BUILD_ARGS=()
+if [[ -n "${IMAGE_SOURCE:-}" ]]; then
+  BUILD_ARGS+=(--build-arg "IMAGE_SOURCE=${IMAGE_SOURCE}")
+fi
+
+docker build \
+  -f "$DOCKERFILE" \
+  -t "$TAG" \
+  "${BUILD_ARGS[@]}" \
+  "$CONTEXT"

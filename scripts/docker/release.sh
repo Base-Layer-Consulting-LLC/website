@@ -6,9 +6,11 @@ ROOT_DIR="$(git rev-parse --show-toplevel)"
 VERSION="$(<"$ROOT_DIR/.containers/${IMAGE}/VERSION")"
 REGISTRY="${REGISTRY:-ghcr.io}"
 
+REPO_LC="${GITHUB_REPOSITORY,,}"
+
 case "$REGISTRY" in
 ghcr.io)
-  IMAGE_NAME="${REGISTRY}/${GITHUB_REPOSITORY}/${IMAGE}"
+  IMAGE_NAME="${REGISTRY}/${REPO_LC}/${IMAGE}"
   ;;
 *)
   echo "Unsupported registry" >&2

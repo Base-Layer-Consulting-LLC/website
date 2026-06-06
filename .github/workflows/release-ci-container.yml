@@ -34,6 +34,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_ACTOR: ${{ github.actor }}
+          IMAGE_SOURCE: https://github.com/${{ github.repository }}
         run: ./scripts/docker/release.sh ci
 
       - name: Close bump PR and delete branch
