@@ -1,0 +1,43 @@
+---
+#############################################################
+# Release .containers/ci image to Github Container Registry #
+#############################################################
+
+name: Release CI container
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .containers/ci/**
+      - scripts/docker/**
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      pull-requests: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Make scripts executable
+        run: chmod +x scripts/docker/*.sh
+
+      - name: Build and push image
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_ACTOR: ${{ github.actor }}
+        run: ./scripts/docker/release.sh ci
+
+      - name: Close bump PR and delete branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr close chore/bump-ci-container --delete-branch || true

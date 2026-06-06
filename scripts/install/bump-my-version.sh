@@ -12,15 +12,39 @@ fi
 
 echo "Installing bump-my-version"
 
-py=""
-if py="$(python_bin 2>/dev/null)"; then
-  :
-else
-  install_python
-  py="$(python_bin)"
-fi
+id="$(detect_os_id)"
 
-"$py" -m pip install --user --upgrade pip
-"$py" -m pip install --user bump-my-version
+case "$id" in
+ubuntu | debian)
+  if ! has_cmd python3; then
+    install_cmd python3
+  fi
+
+  if ! has_cmd python3-venv; then
+    sudo apt-get update
+    sudo apt-get install -y python3-venv
+  fi
+
+  python3 -m venv /opt/bump-my-version-venv
+
+  /opt/bump-my-version-venv/bin/pip install --upgrade pip
+  /opt/bump-my-version-venv/bin/pip install bump-my-version
+
+  ln -sf /opt/bump-my-version-venv/bin/bump-my-version /usr/local/bin/bump-my-version
+  ;;
+fedora | rhel | centos | rocky | almalinux | arch | manjaro | alpine)
+  if ! has_cmd python3; then
+    install_cmd python3
+  fi
+  python3 -m venv /opt/bump-my-version-venv
+  /opt/bump-my-version-venv/bin/pip install --upgrade pip
+  /opt/bump-my-version-venv/bin/pip install bump-my-version
+  ln -sf /opt/bump-my-version-venv/bin/bump-my-version /usr/local/bin/bump-my-version
+  ;;
+*)
+  echo "[ERROR] Unsupported Linux distro for bump-my-version install: $id" >&2
+  exit 1
+  ;;
+esac
 
 echo "bump-my-version installed"

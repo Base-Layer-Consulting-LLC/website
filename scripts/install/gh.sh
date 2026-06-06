@@ -47,8 +47,7 @@ arch | manjaro)
   sudo pacman -Sy --noconfirm github-cli
   ;;
 alpine)
-  echo "[ERROR] gh install not supported on alpine in this script" >&2
-  exit 1
+  apk add --no-cache github-cli
   ;;
 *)
   echo "[ERROR] Unsupported Linux distro for gh install: $id" >&2
