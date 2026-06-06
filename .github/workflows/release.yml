@@ -23,7 +23,8 @@ jobs:
     permissions:
       contents: write
     outputs:
-      version: ${{ steps.release_outputs.outputs.version }}
+      released: ${{ steps.run_release.outputs.released }}
+      version: ${{ steps.run_release.outputs.version }}
     env:
       BASE_BRANCH: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.base_branch || 'main' }}
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run || 'false' }}
@@ -53,6 +54,7 @@ jobs:
         run: npm ci --prefix site
 
       - name: Run release
+        id: run_release
         env:
           ASTRO_TELEMETRY_DISABLED: "1"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -65,14 +67,9 @@ jobs:
 
           ./scripts/release/release.sh $DRY_RUN_FLAG release --base-branch "$BASE_BRANCH"
 
-      - name: Export version
-        id: release_outputs
-        run: |
-          echo "version=$(<VERSION)" >> "$GITHUB_OUTPUT"
-
   deploy_cloudflare:
     needs: release
-    if: needs.release.outputs.version != ''
+    if: needs.release.outputs.released == 'true'
     uses: ./.github/workflows/deploy-cloudflare.yml
     with:
       version: ${{ needs.release.outputs.version }}
