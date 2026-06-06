@@ -66,7 +66,7 @@ if [[ -z "$VERSION" ]]; then
 fi
 
 if [[ -z "$ASSET_NAME" ]]; then
-  ASSET_NAME="site-${TAG_NAME}.tar.gz"
+  ASSET_NAME="site-v${VERSION}.tar.gz"
 fi
 
 if [[ -z "$OUTPUT_DIR" ]]; then

@@ -47,7 +47,7 @@ RELEASE_NAME="site-v${VERSION}"
 
 if $DRY_RUN; then
   echo "Would create release: ${RELEASE_NAME}"
-  echo "Would tag: ${TAG_NAME}"
+  echo "Would use tag: ${TAG_NAME}"
   echo "Would upload asset: ${ARCHIVE_NAME}"
   exit 0
 fi

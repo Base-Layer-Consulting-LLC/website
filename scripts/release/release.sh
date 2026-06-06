@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-##############################################################
-# Orchestrate version bump, packaging, tagging, and release. #
-##############################################################
+############################################################
+# Orchestrate version bump, build, packaging, and release. #
+############################################################
 
 DRY_RUN=false
 MODE=""
 BASE_BRANCH="main"
 
-usage() {
+function usage() {
   cat <<EOF
 Usage:
   $0 [--dry-run] <pr|release> [--base-branch <branch>]
@@ -36,7 +36,7 @@ while [[ $# -gt 0 ]]; do
     ;;
   *)
     echo "[ERROR] Unknown arg: $1" >&2
-    usage
+    usage >&2
     exit 1
     ;;
   esac
@@ -50,6 +50,12 @@ fi
 ROOT_DIR="$(git rev-parse --show-toplevel)"
 cd "$ROOT_DIR"
 
+## Default outputs
+if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+  echo "released=false" >>"$GITHUB_OUTPUT"
+fi
+
+## Skip logic for release commits
 if [[ "$MODE" == "release" && "$DRY_RUN" == false ]]; then
   HEAD_MSG="$(git log -1 --pretty=%B)"
   if grep -q '\[release skip\]' <<<"$HEAD_MSG"; then
@@ -58,7 +64,9 @@ if [[ "$MODE" == "release" && "$DRY_RUN" == false ]]; then
   fi
 fi
 
+## Detect version bump
 BUMPTYPE="$(./scripts/versioning/detect-bump.sh "$BASE_BRANCH")"
+
 if [[ -z "$BUMPTYPE" ]]; then
   echo "No version bump required"
   exit 0
@@ -66,36 +74,60 @@ fi
 
 echo "Detected bump type: $BUMPTYPE"
 
+## PR mode
 if [[ "$MODE" == "pr" ]]; then
-  echo "PR mode: running Astro build only"
-  ./scripts/astro/build.sh
+  echo "PR mode: building site only"
+  npm ci --prefix site
+  (cd site && npm run build)
+
+  test -f site/dist/index.html
+  echo "Build OK"
   exit 0
 fi
 
+## Dry run
 CURRENT_VERSION="$(<VERSION)"
 NEXT_VERSION="$(./scripts/versioning/bump-version.sh -b "$BUMPTYPE" --print-next-version)"
 
 if $DRY_RUN; then
-  echo "Dry run preview:"
-  echo "  Current VERSION: ${CURRENT_VERSION}"
-  echo "  Next VERSION:    ${NEXT_VERSION}"
-  echo "  Archive name:    site-v${CURRENT_VERSION}.tar.gz"
-  echo "  No commit, tag, or release will be created."
+  echo "Dry run:"
+  echo "  Current: $CURRENT_VERSION"
+  echo "  Next:    $NEXT_VERSION"
 
   ./scripts/versioning/bump-version.sh -b "$BUMPTYPE" --dry-run
-  ./scripts/astro/build.sh
+
+  npm ci --prefix site
+  (cd site && npm run build)
+
+  test -f site/dist/index.html
+
   ./scripts/release/package-site.sh --dry-run --version "$CURRENT_VERSION"
   ./scripts/release/create-release.sh --dry-run --version "$CURRENT_VERSION"
-  echo "Dry run: skipping commit, tag, push, and upload"
+
   exit 0
 fi
+
+## Real release
 
 ./scripts/versioning/bump-version.sh -b "$BUMPTYPE"
 VERSION="$(<VERSION)"
 TAG_NAME="v${VERSION}"
 
+echo "Releasing $TAG_NAME"
+
+## Build site
+(cd site && npm run build)
+
+## Validate build output
+if [[ ! -f site/dist/index.html ]]; then
+  echo "[ERROR] Astro build output missing" >&2
+  exit 1
+fi
+
+## Git commit + tag
 git config user.name "github-actions[bot]"
 git config user.email "github-actions[bot]@users.noreply.github.com"
+
 git add VERSION
 git commit -m "chore(release): bump version to ${VERSION} [release skip]"
 
@@ -103,6 +135,14 @@ git push origin HEAD:main
 git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
 git push origin "$TAG_NAME"
 
-./scripts/astro/build.sh
+## Package + publish
 ./scripts/release/package-site.sh --version "$VERSION"
 ./scripts/release/create-release.sh --version "$VERSION"
+
+## Export release metadata
+if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+  {
+    echo "released=true"
+    echo "version=$VERSION"
+  } >>"$GITHUB_OUTPUT"
+fi

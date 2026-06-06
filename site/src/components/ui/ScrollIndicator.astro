@@ -1,0 +1,30 @@
+---
+import { PhMouseSimple, PhCaretDoubleDown } from "phosphor-icons-astro";
+
+interface Props {
+  href?: string;
+}
+
+const { href = "#services" } = Astro.props;
+---
+
+<a
+  href={href}
+  class="group flex flex-col items-center gap-2 opacity-60 hover:opacity-100 transition-opacity duration-300"
+>
+  <!-- Desktop -->
+  <div class="hidden md:flex flex-col items-center gap-2">
+    <PhMouseSimple class="h-8 w-8 animate-[float_2s_ease-in-out_infinite]" />
+
+    <span class="text-xs uppercase tracking-[0.25em]"> Scroll </span>
+  </div>
+
+  <!-- Mobile -->
+  <div class="flex md:hidden flex-col items-center gap-2">
+    <PhCaretDoubleDown
+      class="h-8 w-8 animate-[float_2s_ease-in-out_infinite]"
+    />
+
+    <span class="text-xs uppercase tracking-[0.25em]"> Swipe </span>
+  </div>
+</a>

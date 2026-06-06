@@ -1,0 +1,94 @@
+---
+interface Props {
+  title: string;
+  body: string;
+  animate?: string;
+  delay?: string;
+  duration?: string;
+  class?: string;
+}
+
+const {
+  title,
+  body,
+  animate = "fadeInUp",
+  delay = "0s",
+  duration = "0.8s",
+  class: className = "",
+} = Astro.props;
+---
+
+<service-card
+  class:list={[
+    "service-card opacity-0 card bg-base-200 shadow-sm text-left h-full w-full",
+    className,
+  ]}
+  data-animate-name={animate}
+  data-delay={delay}
+  data-duration={duration}
+>
+  <div class="card-body">
+    <div class="flex items-center justify-center gap-2">
+      <slot name="icon" />
+      <h3 class="card-title text-lg justify-center text-center m-0">
+        {title}
+      </h3>
+    </div>
+
+    <hr />
+
+    <p class="text-center justify-center">{body}</p>
+  </div>
+
+  <script>
+    class ServiceCard extends HTMLElement {
+      connectedCallback() {
+        if (this.dataset.inited === "true") return;
+        this.dataset.inited = "true";
+
+        if (!("IntersectionObserver" in window)) {
+          this.classList.remove("opacity-0");
+          this.classList.add(
+            "animate__animated",
+            `animate__${this.dataset.animateName || "fadeInUp"}`,
+          );
+          this.style.setProperty(
+            "--animate-duration",
+            this.dataset.duration || "0.8s",
+          );
+          this.style.setProperty("--animate-delay", this.dataset.delay || "0s");
+          return;
+        }
+
+        const observer = new IntersectionObserver(
+          (entries, obs) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+
+              const name = this.dataset.animateName || "fadeInUp";
+              const delay = this.dataset.delay || "0s";
+              const duration = this.dataset.duration || "0.8s";
+
+              this.classList.remove("opacity-0");
+              this.classList.add("animate__animated", `animate__${name}`);
+              this.style.setProperty("--animate-duration", duration);
+              this.style.setProperty("--animate-delay", delay);
+
+              obs.unobserve(this);
+            });
+          },
+          {
+            threshold: 0.15,
+            rootMargin: "0px 0px -10% 0px",
+          },
+        );
+
+        observer.observe(this);
+      }
+    }
+
+    if (!customElements.get("service-card")) {
+      customElements.define("service-card", ServiceCard);
+    }
+  </script>
+</service-card>

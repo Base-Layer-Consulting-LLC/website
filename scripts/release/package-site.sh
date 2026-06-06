@@ -2,7 +2,7 @@
 set -euo pipefail
 
 #######################################################################
-# Copy VERSION file into site/ directory, then create .tar.gz archive #
+# Copy VERSION file into the dist root, then create .tar.gz archive   #
 #######################################################################
 
 DRY_RUN=false
@@ -50,8 +50,15 @@ if $DRY_RUN; then
   exit 0
 fi
 
+if [[ ! -d "$BUILD_DIR" ]]; then
+  echo "[ERROR] Build directory not found: $BUILD_DIR" >&2
+  exit 1
+fi
+
 rm -rf "$TMP_BUILD_DIR"
-cp -R "$BUILD_DIR" "$TMP_BUILD_DIR"
+mkdir -p "$TMP_BUILD_DIR"
+
+cp -R "$BUILD_DIR"/. "$TMP_BUILD_DIR"/
 cp "${REPO_ROOT}/VERSION" "${TMP_BUILD_DIR}/VERSION"
 
 tar -C "$TMP_BUILD_DIR" -czf "${REPO_ROOT}/${ARCHIVE_NAME}" .

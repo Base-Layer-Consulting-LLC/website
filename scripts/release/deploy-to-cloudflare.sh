@@ -59,7 +59,7 @@ if $FORCE; then
   if $DRY_RUN; then
     echo "Dry run: would run npm ci in site/"
     echo "Dry run: would build site"
-    echo "Dry run: would deploy site/dist to Cloudflare Pages"
+    echo "Dry run: would deploy site/dist/client to Cloudflare Pages"
     exit 0
   fi
 
@@ -73,21 +73,31 @@ DOWNLOAD_DIR="$(mktemp -d)"
 EXTRACT_DIR="$(mktemp -d)"
 trap 'rm -rf "$DOWNLOAD_DIR" "$EXTRACT_DIR"' EXIT
 
-ARTIFACT_PATH="$(./scripts/release/download-release-artifact.sh \
-  ${VERSION:+--version "$VERSION"} \
-  ${TAG_NAME:+--tag "$TAG_NAME"} \
-  ${ASSET_NAME:+--asset "$ASSET_NAME"} \
-  --output-dir "$DOWNLOAD_DIR")"
+ARGS=()
+if [[ -n "$VERSION" ]]; then
+  ARGS+=(--version "$VERSION")
+fi
+if [[ -n "$TAG_NAME" ]]; then
+  ARGS+=(--tag "$TAG_NAME")
+fi
+if [[ -n "$ASSET_NAME" ]]; then
+  ARGS+=(--asset "$ASSET_NAME")
+fi
+
+ARTIFACT_PATH="$(./scripts/release/download-release-artifact.sh "${ARGS[@]}" --output-dir "$DOWNLOAD_DIR")"
 
 tar -xzf "$ARTIFACT_PATH" -C "$EXTRACT_DIR"
 
-DEPLOY_DIR="$EXTRACT_DIR/site-v${VERSION:-${TAG_NAME#v}}"
-if [[ ! -d "$DEPLOY_DIR" ]]; then
+DEPLOY_DIR=""
+if [[ -f "$EXTRACT_DIR/index.html" ]]; then
   DEPLOY_DIR="$EXTRACT_DIR"
+else
+  echo "[ERROR] No deployable directory found in extracted asset" >&2
+  exit 1
 fi
 
-if [[ ! -d "$DEPLOY_DIR" ]]; then
-  echo "[ERROR] Deploy directory not found: $DEPLOY_DIR" >&2
+if [[ -z "$DEPLOY_DIR" ]]; then
+  echo "[ERROR] No deployable directory found in extracted asset" >&2
   exit 1
 fi
 
