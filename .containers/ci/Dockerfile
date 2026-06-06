@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 ## https://hub.docker.com/_/alpine/
-ARG ALPINE_IMG=3.22.4
+ARG ALPINE_IMG=3.22
 FROM alpine:${ALPINE_IMG} AS base
 
 ARG IMAGE_SOURCE=""
