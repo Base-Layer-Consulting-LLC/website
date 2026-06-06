@@ -50,3 +50,9 @@ jobs:
         env:
           ASTRO_TELEMETRY_DISABLED: "1"
         run: ./scripts/release/release.sh pr --base-branch main
+
+      - name: Verify static output
+        if: steps.site_changes.outputs.changed == 'true'
+        run: |
+          test -f site/dist/index.html
+          test -d site/dist/_astro

@@ -10,8 +10,6 @@ cd "$ROOT_DIR"
 
 VERSION="${INPUT_VERSION:-}"
 DRY_RUN="${INPUT_DRY_RUN:-false}"
-TAG_NAME=""
-ASSET_NAME=""
 
 if [[ -z "$VERSION" ]]; then
   VERSION="$(<VERSION)"
@@ -34,16 +32,9 @@ if [[ "$DRY_RUN" == "true" ]]; then
   exit 0
 fi
 
-if ! gh release view "$TAG_NAME" >/dev/null 2>&1; then
-  echo "Release ${TAG_NAME} does not exist."
-fi
-
 if [[ ! -f "$ASSET_NAME" ]]; then
-  echo "Missing asset ${ASSET_NAME}; building it now."
-
   npm ci --prefix site
   (cd site && npm run build)
-
   ./scripts/release/package-site.sh --version "$VERSION"
 fi
 

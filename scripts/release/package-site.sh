@@ -41,7 +41,7 @@ if [[ -z "$VERSION" ]]; then
   VERSION="$(<"${REPO_ROOT}/VERSION")"
 fi
 
-BUILD_DIR="${REPO_ROOT}/site/dist/client"
+BUILD_DIR="${REPO_ROOT}/site/dist"
 ARCHIVE_NAME="site-v${VERSION}.tar.gz"
 TMP_BUILD_DIR="${REPO_ROOT}/.release-site"
 
