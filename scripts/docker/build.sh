@@ -2,7 +2,6 @@
 set -euo pipefail
 
 IMAGE="${1:-}"
-
 if [[ -z "$IMAGE" ]]; then
   echo "Usage: $0 <image>"
   exit 1
@@ -22,7 +21,4 @@ ci)
   ;;
 esac
 
-docker build \
-  -f "$DOCKERFILE" \
-  -t "$TAG" \
-  "$CONTEXT"
+docker build -f "$DOCKERFILE" -t "$TAG" "$CONTEXT"

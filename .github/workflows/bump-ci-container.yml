@@ -1,0 +1,61 @@
+---
+###########################################################
+# Bump .containers/ci/VERSION file on Dockerfile changes. #
+###########################################################
+
+name: Bump CI container
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Make scripts executable
+        run: chmod +x scripts/docker/*.sh
+
+      - name: Configure git identity
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create or reuse bump branch
+        run: |
+          git fetch origin main
+          git checkout -B chore/bump-ci-container origin/main
+
+      - name: Bump version
+        run: ./scripts/docker/bump.sh --allow-dirty
+
+      - name: Commit bump
+        run: |
+          git add .containers/ci/VERSION .containers/ci/.bumpversion.toml
+          git commit -m "chore(ci): bump container version" || exit 0
+
+      - name: Push branch
+        run: git push --force-with-lease origin chore/bump-ci-container
+
+      - name: Open or update PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh pr view chore/bump-ci-container >/dev/null 2>&1; then
+            gh pr edit chore/bump-ci-container \
+              --title "chore(ci): bump container version" \
+              --body "Automated bump of the CI container version."
+          else
+            gh pr create \
+              --base main \
+              --head chore/bump-ci-container \
+              --title "chore(ci): bump container version" \
+              --body "Automated bump of the CI container version."
+          fi
