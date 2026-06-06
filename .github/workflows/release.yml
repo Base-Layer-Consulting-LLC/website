@@ -42,34 +42,17 @@ jobs:
           ./scripts/install/bump-my-version.sh
           ./scripts/install/gh.sh
 
-      - name: Detect site changes
-        id: site_changes
-        run: |
-          echo "changed=$(
-            ./scripts/release/detect-changes.sh "$BASE_BRANCH" | cut -d= -f2
-          )" >> "$GITHUB_OUTPUT"
-
       - name: Set up Node
-        if: steps.site_changes.outputs.changed == 'true'
         uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: npm
           cache-dependency-path: site/package-lock.json
 
-      - name: Install site dependencies
-        if: steps.site_changes.outputs.changed == 'true'
-        working-directory: site
-        run: npm ci
-
-      - name: Configure git identity
-        if: steps.site_changes.outputs.changed == 'true'
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Install dependencies (script owns build)
+        run: npm ci --prefix site
 
       - name: Run release
-        if: steps.site_changes.outputs.changed == 'true'
         env:
           ASTRO_TELEMETRY_DISABLED: "1"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -84,7 +67,6 @@ jobs:
 
       - name: Export version
         id: release_outputs
-        if: steps.site_changes.outputs.changed == 'true'
         run: |
           echo "version=$(<VERSION)" >> "$GITHUB_OUTPUT"
 
