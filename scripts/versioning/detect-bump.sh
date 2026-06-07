@@ -10,7 +10,8 @@ BASE_BRANCH="${1:-main}"
 ROOT_DIR="$(git rev-parse --show-toplevel)"
 cd "$ROOT_DIR"
 
-## Find the most recent commit shared with the base branch.
+## Resolve the base branch ref, preferring a local branch and then origin/*.
+#  This lets the script work in both local checkouts and CI clones.
 if git rev-parse --verify --quiet "$BASE_BRANCH" >/dev/null; then
   BASE_REF="$BASE_BRANCH"
 elif git rev-parse --verify --quiet "origin/$BASE_BRANCH" >/dev/null; then
@@ -20,9 +21,12 @@ else
   exit 1
 fi
 
+## Compare the current branch against its merge-base with the base branch.
+#  This ignores unrelated history on the base branch and only inspects commits
+#  that are unique to the current branch.
 BASE_REF="$(git merge-base "$BASE_REF" HEAD)"
 
-## Exit if nothing in site/ changed between the base branch and HEAD.
+## If nothing changed in the site/ dir, no bump is needed
 if git diff --quiet "$BASE_REF" HEAD -- site/; then
   exit 0
 fi

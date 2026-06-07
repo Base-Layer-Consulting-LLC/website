@@ -41,6 +41,8 @@ if [[ -z "$VERSION" ]]; then
   VERSION="$(<"${ROOT_DIR}/VERSION")"
 fi
 
+## Release names and tags are derived from the same version so the GitHub
+#  release, git tag, and asset name stay aligned.
 ARCHIVE_NAME="site-v${VERSION}.tar.gz"
 TAG_NAME="v${VERSION}"
 RELEASE_NAME="site-v${VERSION}"
@@ -52,6 +54,7 @@ if $DRY_RUN; then
   exit 0
 fi
 
+## Create Github release from tag with site archive asset
 gh release create "$TAG_NAME" "${ROOT_DIR}/${ARCHIVE_NAME}" \
   --title "$RELEASE_NAME" \
   --notes "Release ${RELEASE_NAME}"

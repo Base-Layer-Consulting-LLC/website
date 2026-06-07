@@ -55,6 +55,9 @@ done
 ROOT_DIR="$(git rev-parse --show-toplevel)"
 cd "$ROOT_DIR"
 
+## Skip downloading release asset, rebuild the site and deploy
+#  that instead. While not best practice, this is an avenue
+#  to force push a change quickly, sidestepping the release process.
 if $FORCE; then
   if $DRY_RUN; then
     echo "Dry run: would run npm ci in site/"
@@ -63,6 +66,7 @@ if $FORCE; then
     exit 0
   fi
 
+  ## Rebuild and deploy site
   npm ci --prefix site
   (cd site && npm run build)
   npx wrangler pages deploy "site/dist" --project-name "$CLOUDFLARE_PAGES_PROJECT_PROD"
@@ -84,10 +88,14 @@ if [[ -n "$ASSET_NAME" ]]; then
   ARGS+=(--asset "$ASSET_NAME")
 fi
 
+## Download release artifact from Github and output path to variable
 ARTIFACT_PATH="$(./scripts/release/download-release-artifact.sh "${ARGS[@]}" --output-dir "$DOWNLOAD_DIR")"
 
+## Extract downloaded release
 tar -xzf "$ARTIFACT_PATH" -C "$EXTRACT_DIR"
 
+## Find index.html to set the directory path that should be deployed.
+#  This might be the root of the archive, or a subdirectory like site/.
 DEPLOY_DIR=""
 if [[ -f "$EXTRACT_DIR/index.html" ]]; then
   DEPLOY_DIR="$EXTRACT_DIR"
@@ -106,4 +114,5 @@ if $DRY_RUN; then
   exit 0
 fi
 
+## Deploy to Cloudflare Pages
 npx wrangler pages deploy "$DEPLOY_DIR" --project-name "$CLOUDFLARE_PAGES_PROJECT_PROD"
