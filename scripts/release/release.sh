@@ -74,14 +74,50 @@ if [[ "$MODE" == "release" && "$DRY_RUN" == false ]]; then
   fi
 fi
 
-if [[ -n "$BEFORE_SHA" && -n "$AFTER_SHA" ]]; then
+if [[ "$MODE" == "release" && -n "$BEFORE_SHA" && -n "$AFTER_SHA" ]]; then
   if git diff --quiet "$BEFORE_SHA" "$AFTER_SHA" -- site/; then
     echo "No version bump required"
     exit 0
   fi
+
+  SUBJECTS="$(git log --format=%s "${BEFORE_SHA}..${AFTER_SHA}")"
+  BODIES="$(git log --format=%B "${BEFORE_SHA}..${AFTER_SHA}")"
+else
+  if git rev-parse --verify --quiet "$BASE_BRANCH" >/dev/null; then
+    BASE_REF="$BASE_BRANCH"
+  elif git rev-parse --verify --quiet "origin/$BASE_BRANCH" >/dev/null; then
+    BASE_REF="origin/$BASE_BRANCH"
+  else
+    echo "[ERROR] Unable to resolve base branch: $BASE_BRANCH" >&2
+    exit 1
+  fi
+
+  BASE_REF="$(git merge-base "$BASE_REF" HEAD)"
+
+  if git diff --quiet "$BASE_REF" HEAD -- site/; then
+    echo "No version bump required"
+    exit 0
+  fi
+
+  SUBJECTS="$(git log --format=%s "$BASE_REF..HEAD")"
+  BODIES="$(git log --format=%B "$BASE_REF..HEAD")"
 fi
 
-BUMPTYPE="$(./scripts/versioning/detect-bump.sh "$BASE_BRANCH")"
+if [[ -z "$SUBJECTS" ]]; then
+  echo "No version bump required"
+  exit 0
+fi
+
+if grep -q 'BREAKING CHANGE' <<<"$BODIES" ||
+  grep -Eq '^[a-z]+(\([^)]+\))?!:' <<<"$SUBJECTS"; then
+  BUMPTYPE="major"
+elif grep -Eq '^feat(\([^)]+\))?:' <<<"$SUBJECTS"; then
+  BUMPTYPE="minor"
+elif grep -Eq '^fix(\([^)]+\))?:' <<<"$SUBJECTS"; then
+  BUMPTYPE="patch"
+else
+  BUMPTYPE=""
+fi
 
 if [[ -z "$BUMPTYPE" ]]; then
   echo "No version bump required"
