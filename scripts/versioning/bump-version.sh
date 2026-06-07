@@ -93,8 +93,8 @@ echo "$NEXT_VERSION" >"${ROOT_DIR}/VERSION"
 
 ## Update current_version line in .bumpversion.toml
 if [[ -f "${ROOT_DIR}/.bumpversion.toml" ]]; then
-  if grep -q "^current_version = \"${CURRENT_VERSION}\"$" "${ROOT_DIR}/.bumpversion.toml"; then
-    sed -i "s/^current_version = \"${CURRENT_VERSION}\"$/current_version = \"${NEXT_VERSION}\"/" "${ROOT_DIR}/.bumpversion.toml"
+  if grep -q '^current_version = "' "${ROOT_DIR}/.bumpversion.toml"; then
+    sed -i -E "s/^current_version = \".*\"$/current_version = \"${NEXT_VERSION}\"/" "${ROOT_DIR}/.bumpversion.toml"
   else
     echo "[ERROR] .bumpversion.toml current_version line not found or unexpected format" >&2
     exit 1
