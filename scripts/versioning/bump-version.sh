@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ############################################
-# Bump version files with bump-my-version  #
+# Bump version files, i.e. VERSION at root #
 ############################################
 
 DRY_RUN=false
@@ -53,6 +53,7 @@ cd "$ROOT_DIR"
 
 CURRENT_VERSION="$(<VERSION)"
 
+## Determine bump type
 IFS=. read -r major minor patch <<<"$CURRENT_VERSION"
 case "$BUMP_TYPE" in
 major)
@@ -73,6 +74,7 @@ patch)
   ;;
 esac
 
+## Build next version string
 NEXT_VERSION="${major}.${minor}.${patch}"
 
 if $PRINT_NEXT_VERSION; then
@@ -86,8 +88,10 @@ if $DRY_RUN; then
   exit 0
 fi
 
+## Overwrite version string in VERSION file
 echo "$NEXT_VERSION" >"${ROOT_DIR}/VERSION"
 
+## Update current_version line in .bumpversion.toml
 if [[ -f "${ROOT_DIR}/.bumpversion.toml" ]]; then
   if grep -q "^current_version = \"${CURRENT_VERSION}\"$" "${ROOT_DIR}/.bumpversion.toml"; then
     sed -i "s/^current_version = \"${CURRENT_VERSION}\"$/current_version = \"${NEXT_VERSION}\"/" "${ROOT_DIR}/.bumpversion.toml"
