@@ -2,9 +2,20 @@
 set -euo pipefail
 
 BASE_BRANCH="${1:-main}"
+FROM_SHA="${2:-}"
+TO_SHA="${3:-}"
 
 ROOT_DIR="$(git rev-parse --show-toplevel)"
 cd "$ROOT_DIR"
+
+if [[ -n "$FROM_SHA" && -n "$TO_SHA" ]]; then
+  if git diff --quiet "$FROM_SHA" "$TO_SHA" -- site/; then
+    echo "changed=false"
+  else
+    echo "changed=true"
+  fi
+  exit 0
+fi
 
 if git rev-parse --verify --quiet "$BASE_BRANCH" >/dev/null; then
   BASE_REF="$BASE_BRANCH"
