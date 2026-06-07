@@ -8,11 +8,13 @@ set -euo pipefail
 DRY_RUN=false
 MODE=""
 BASE_BRANCH="main"
+BEFORE_SHA=""
+AFTER_SHA=""
 
 function usage() {
   cat <<EOF
 Usage:
-  $0 [--dry-run] <pr|release> [--base-branch <branch>]
+  $0 [--dry-run] <pr|release> [--base-branch <branch>] [--before-sha <sha>] [--after-sha <sha>]
 EOF
 }
 
@@ -28,6 +30,14 @@ while [[ $# -gt 0 ]]; do
     ;;
   -b | --base-branch)
     BASE_BRANCH="${2:-main}"
+    shift 2
+    ;;
+  --before-sha)
+    BEFORE_SHA="${2:-}"
+    shift 2
+    ;;
+  --after-sha)
+    AFTER_SHA="${2:-}"
     shift 2
     ;;
   -h | --help)
@@ -64,7 +74,13 @@ if [[ "$MODE" == "release" && "$DRY_RUN" == false ]]; then
   fi
 fi
 
-## Detect version bump
+if [[ -n "$BEFORE_SHA" && -n "$AFTER_SHA" ]]; then
+  if git diff --quiet "$BEFORE_SHA" "$AFTER_SHA" -- site/; then
+    echo "No version bump required"
+    exit 0
+  fi
+fi
+
 BUMPTYPE="$(./scripts/versioning/detect-bump.sh "$BASE_BRANCH")"
 
 if [[ -z "$BUMPTYPE" ]]; then
@@ -79,7 +95,6 @@ if [[ "$MODE" == "pr" ]]; then
   echo "PR mode: building site only"
   npm ci --prefix site
   (cd site && npm run build)
-
   test -f site/dist/index.html
   echo "Build OK"
   exit 0

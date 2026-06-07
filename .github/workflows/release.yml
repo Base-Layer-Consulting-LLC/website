@@ -28,6 +28,8 @@ jobs:
     env:
       BASE_BRANCH: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.base_branch || 'main' }}
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run || 'false' }}
+      PUSH_BEFORE_SHA: ${{ github.event_name == 'push' && github.event.before || '' }}
+      PUSH_AFTER_SHA: ${{ github.event_name == 'push' && github.sha || '' }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -50,7 +52,7 @@ jobs:
           cache: npm
           cache-dependency-path: site/package-lock.json
 
-      - name: Install dependencies (script owns build)
+      - name: Install dependencies
         run: npm ci --prefix site
 
       - name: Run release
@@ -65,7 +67,11 @@ jobs:
             DRY_RUN_FLAG="--dry-run"
           fi
 
-          ./scripts/release/release.sh $DRY_RUN_FLAG release --base-branch "$BASE_BRANCH"
+          if [[ -n "${PUSH_BEFORE_SHA:-}" && -n "${PUSH_AFTER_SHA:-}" ]]; then
+            ./scripts/release/release.sh $DRY_RUN_FLAG release --before-sha "$PUSH_BEFORE_SHA" --after-sha "$PUSH_AFTER_SHA"
+          else
+            ./scripts/release/release.sh $DRY_RUN_FLAG release --base-branch "$BASE_BRANCH"
+          fi
 
   deploy_cloudflare:
     needs: release
