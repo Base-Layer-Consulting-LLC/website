@@ -49,6 +49,17 @@ jobs:
         if: steps.site_changes.outputs.changed == 'true'
         env:
           ASTRO_TELEMETRY_DISABLED: "1"
+
+          ## Astro env vars
+          PUBLIC_SITE_ADDR: ${{ secrets.PUBLIC_SITE_ADDR }}
+          PUBLIC_BUSINESS_NAME: ${{ secrets.PUBLIC_BUSINESS_NAME }}
+          PUBLIC_BUSINESS_NAME_SHORT: ${{ secrets.PUBLIC_BUSINESS_NAME_SHORT }}
+          PUBLIC_BUSINESS_TAGLINE: ${{ secrets.PUBLIC_BUSINESS_TAGLINE }}
+          PUBLIC_CONTACT_EMAIL_ADDR_MAIN: ${{ secrets.PUBLIC_CONTACT_EMAIL_ADDR_MAIN }}
+
+          CONTACT_PHONE_NUMBER_MAIN: ${{ secrets.CONTACT_PHONE_NUMBER_MAIN }}
+
+          PUBLIC_FORMSPREE_CONTACT_FORM_ID: ${{ secrets.PUBLIC_FORMSPREE_CONTACT_FORM_ID }}
         run: ./scripts/release/release.sh pr --base-branch main
 
       - name: Verify static output
