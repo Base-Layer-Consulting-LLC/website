@@ -1,0 +1,91 @@
+---
+name: Test Astro build action
+
+on:
+  push:
+    branches:
+      - feat/astro-build-pipeline
+  workflow_dispatch:
+    inputs:
+      check-changed:
+        description: Only build when Astro-relevant files changed.
+        required: false
+        type: boolean
+        default: false
+
+      debug-build:
+        description: Print Astro build diagnostics.
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Astro site
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout site repository
+        uses: actions/checkout@v7
+        with:
+          # The detector compares HEAD~1..HEAD when enabled.
+          fetch-depth: 2
+
+      - name: Build Astro site
+        id: astro
+        uses: redjax/PipelineTemplates/.github/actions/astro-build@feat/astro-build-action
+        with:
+          # Repository layout:
+          #   ./scripts/astro/build.sh
+          #   ./site/package.json
+          #   ./site/astro.config.mjs
+          #   ./site/dist
+          working-directory: "."
+          astro-project-dir: "site"
+          output-dir: "site/dist"
+
+          node-version: "24"
+          install-command: "npm ci"
+          build-command: "./scripts/astro/build.sh"
+
+          clean: "true"
+          check-changed: ${{ inputs.check-changed && 'true' || 'false' }}
+          changed-paths-mode: "default"
+
+          use-node-cache: "true"
+          debug-build: ${{ inputs.debug-build && 'true' || 'false' }}
+
+      - name: Display Astro build results
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          echo "astro-changed=${{ steps.astro.outputs.astro-changed }}"
+          echo "should-build=${{ steps.astro.outputs.should-build }}"
+          echo "working-directory=${{ steps.astro.outputs.working-directory }}"
+          echo "astro-project-dir=${{ steps.astro.outputs.astro-project-dir }}"
+          echo "output-dir=${{ steps.astro.outputs.output-dir }}"
+
+      - name: List generated site files
+        if: ${{ steps.astro.outputs.should-build == 'true' }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          output_dir="${{ steps.astro.outputs.output-dir }}"
+
+          echo "[INFO] Generated site directory: ${output_dir}"
+          echo
+          echo "===== Top-level output ====="
+          find "${output_dir}" -maxdepth 2 -type f -print | sort | sed -n '1,200p'
+
+          echo
+          echo "===== Output size ====="
+          du -sh "${output_dir}"
+
+          echo
+          echo "===== index.html ====="
+          test -f "${output_dir}/index.html"
