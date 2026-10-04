@@ -62,7 +62,7 @@ jobs:
     name: Create Astro GitHub release
     needs:
       - build
-    if: ${{ needs.build.outputs.built == 'true' }}
+    if: ${{ needs.build.result == 'success' }}
 
     uses: redjax/PipelineTemplates/.github/workflows/astro-gh-release.yml@feat/astro-workflows
     with:
