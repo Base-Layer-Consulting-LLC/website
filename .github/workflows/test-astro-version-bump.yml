@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   bump:
-    uses: redjax/PipelineTemplates/.github/workflows/astro-version-bump.yml@feat/astro-build-action
+    uses: redjax/PipelineTemplates/.github/workflows/astro-version-bump.yml@feat/astro-workflows
     with:
       base-branch: main
 
