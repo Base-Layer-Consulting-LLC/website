@@ -1,0 +1,43 @@
+---
+name: Test Astro GitHub release
+
+on:
+  push:
+    branches:
+      - feat/astro-pipelines
+  workflow_dispatch:
+    inputs:
+      build-run-id:
+        description: Workflow run ID that uploaded the Astro artifact.
+        required: true
+        type: string
+
+      create-github-release:
+        description: Create the GitHub Release after creating the tag.
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  release:
+    uses: redjax/PipelineTemplates/.github/workflows/astro-gh-release.yml@feat/astro-workflows
+    with:
+      versioned: true
+      version-file: VERSION
+
+      artifact-name: astro-site-test
+      build-run-id: ${{ inputs.build-run-id }}
+
+      release-prefix: site
+      create-github-release: ${{ github.event.inputs.create-github-release == 'true' }}
+
+      ## Uncomment on merge to main
+      # checkout-ref: main
+      runner: ubuntu-latest
+
+    secrets:
+      release-bot-pat: ${{ secrets.RELEASE_BOT_PAT }}
