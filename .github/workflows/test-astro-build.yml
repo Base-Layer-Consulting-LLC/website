@@ -2,6 +2,9 @@
 name: Test central Astro build workflow
 
 on:
+  push:
+    branches:
+      - feat/astro-build-pipeline
   workflow_dispatch:
     inputs:
       check-changed:
