@@ -17,16 +17,16 @@ jobs:
     with:
       base-branch: main
 
-      bump-script: shared/scripts/ci-cd/astro/bump-site-version.sh
-      bump-branch: ci/astro-version-bump
+      templates-ref: feat/astro-workflows
 
-      commit-message: "chore(astro): bump site version"
-      pull-request-title: "chore(astro): bump site version"
-      pull-request-labels: |
-        automated
-        version-bump
+      version-file: VERSION
+      bump-config: .bumpversion.toml
 
-      delete-branch: true
+      pr-branch: bump/astro-site-version
+      pr-title: "chore(release): bump Astro site version [skip ci]"
+      pr-labels: automated,release
+
+      dry-run: false
       auto-merge: false
       auto-merge-method: merge
 
