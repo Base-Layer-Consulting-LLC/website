@@ -1,0 +1,49 @@
+---
+name: Test central Astro build workflow
+
+on:
+  push:
+    branches:
+      - feat/astro-build-pipeline
+  workflow_dispatch:
+    inputs:
+      check-changed:
+        description: Only build when Astro-relevant files changed.
+        required: false
+        type: boolean
+        default: false
+
+      debug-build:
+        description: Print Astro build diagnostics.
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  build:
+    uses: redjax/PipelineTemplates/.github/workflows/astro-build.yml@feat/astro-workflows
+    with:
+      runner: ubuntu-latest
+
+      working-directory: "."
+      astro-project-dir: "site"
+      output-dir: "site/dist"
+
+      node-version: "24"
+      install-command: "npm ci"
+      build-command: "./scripts/astro/build.sh"
+
+      clean: true
+      check-changed: ${{ github.event.inputs.check-changed == 'true' }}
+      changed-paths-mode: default
+
+      use-node-cache: true
+      debug-build: ${{ github.event.inputs.debug-build == 'true' }}
+
+      artifact-name: astro-site-test
+      artifact-retention-days: 7
+      artifact-if-no-files-found: error
