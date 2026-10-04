@@ -4,7 +4,7 @@ name: Test Astro version bump
 on:
   push:
     branches:
-      - feat/astro-build-pipeline
+      - feat/astro-pipelines
   workflow_dispatch:
 
 permissions:
