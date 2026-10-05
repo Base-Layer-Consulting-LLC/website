@@ -1,69 +1,73 @@
 ---
+################################################################################
+# Validate Astro site changes in pull requests targeting main                  #
+#                                                                              #
+# This workflow builds the Astro site through the shared PipelineTemplates     #
+# workflow. It does not create version bumps, tags, GitHub releases, or        #
+# deployments.                                                                 #
+################################################################################
+
 name: PR validation
 
 on:
   pull_request:
-    branches: [main]
+    branches:
+      - main
+    paths:
+      - "site/src/**"
+      - "site/public/**"
+      - "site/astro.config.*"
+      - "site/package.json"
+      - "site/package-lock.json"
+      - "site/npm-shrinkwrap.json"
+      - "site/pnpm-lock.yaml"
+      - "site/yarn.lock"
+      - "site/tsconfig.json"
+      - "site/tailwind.config.*"
+      - "site/postcss.config.*"
+      - "site/wrangler.json"
+      - "site/wrangler.jsonc"
+      - "scripts/astro/**"
+      - "scripts/install/node.sh"
+      - "scripts/install/_common.sh"
+      - ".github/workflows/pr-checks.yml"
+
+permissions:
+  contents: read
 
 jobs:
-  validate:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+  build:
+    name: Build Astro site
+    uses: redjax/PipelineTemplates/.github/workflows/astro-build.yml@feat/astro-workflows
 
-      - name: Detect site changes
-        id: site_changes
-        run: |
-          echo "changed=$(
-            ./scripts/release/detect-changes.sh main | cut -d= -f2
-          )" >> "$GITHUB_OUTPUT"
+    with:
+      runner: ubuntu-latest
 
-      - name: Make scripts executable
-        run: chmod +x scripts/versioning/*.sh scripts/release/*.sh scripts/install/*.sh scripts/astro/*.sh
+      working-directory: "."
+      astro-project-dir: site
+      output-dir: ${{ vars.CLOUDFLARE_PAGES_ROOT_DIR }}
 
-      - name: Install required tools
-        run: |
-          ./scripts/install/git.sh
-          ./scripts/install/curl.sh
-          ./scripts/install/bump-my-version.sh
-          ./scripts/install/gh.sh
+      node-version: "24"
+      install-command: npm ci
+      build-command: ./scripts/astro/build.sh
 
-      - name: Set up Node
-        if: steps.site_changes.outputs.changed == 'true'
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: npm
-          cache-dependency-path: site/package-lock.json
+      clean: true
 
-      - name: Install site dependencies
-        if: steps.site_changes.outputs.changed == 'true'
-        working-directory: site
-        run: npm ci
+      ## The trigger paths already decide whether this workflow starts.
+      #  Build unconditionally once it starts so PR validation cannot
+      #  accidentally skip a required build.
+      check-changed: false
 
-      - name: Run PR release check
-        if: steps.site_changes.outputs.changed == 'true'
-        env:
-          ASTRO_TELEMETRY_DISABLED: "1"
+      use-node-cache: true
+      debug-build: false
 
-          ## Astro env vars
-          PUBLIC_SITE_ADDR: ${{ secrets.PUBLIC_SITE_ADDR }}
-          PUBLIC_BUSINESS_NAME: ${{ secrets.PUBLIC_BUSINESS_NAME }}
-          PUBLIC_BUSINESS_NAME_SHORT: ${{ secrets.PUBLIC_BUSINESS_NAME_SHORT }}
-          PUBLIC_BUSINESS_TAGLINE: ${{ secrets.PUBLIC_BUSINESS_TAGLINE }}
-          PUBLIC_CONTACT_EMAIL_ADDR_MAIN: ${{ secrets.PUBLIC_CONTACT_EMAIL_ADDR_MAIN }}
+      build-env: |
+        PUBLIC_BUSINESS_NAME=${{ vars.PUBLIC_BUSINESS_NAME }}
+        PUBLIC_BUSINESS_NAME_SHORT=${{ vars.PUBLIC_BUSINESS_NAME_SHORT }}
+        PUBLIC_BUSINESS_TAGLINE=${{ vars.PUBLIC_BUSINESS_TAGLINE }}
+        PUBLIC_CONTACT_EMAIL_ADDR_MAIN=${{ vars.PUBLIC_CONTACT_EMAIL_ADDR_MAIN }}
+        PUBLIC_FORMSPREE_CONTACT_FORM_ID=${{ vars.PUBLIC_FORMSPREE_CONTACT_FORM_ID }}
 
-          CONTACT_PHONE_NUMBER_MAIN: ${{ secrets.CONTACT_PHONE_NUMBER_MAIN }}
-
-          PUBLIC_FORMSPREE_CONTACT_FORM_ID: ${{ secrets.PUBLIC_FORMSPREE_CONTACT_FORM_ID }}
-        run: ./scripts/release/release.sh pr --base-branch main
-
-      - name: Verify static output
-        if: steps.site_changes.outputs.changed == 'true'
-        run: |
-          test -f site/dist/index.html
-          test -d site/dist/_astro
+      artifact-name: astro-pr-site
+      artifact-retention-days: 3
+      artifact-if-no-files-found: error
