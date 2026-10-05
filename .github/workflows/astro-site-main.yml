@@ -12,26 +12,25 @@ name: Astro Site Main
 on:
   push:
     branches:
-      - feat/astro-pipelines
-    #   - main
-    # paths:
-    #   - "site/src/**"
-    #   - "site/public/**"
-    #   - "site/astro.config.*"
-    #   - "site/package.json"
-    #   - "site/package-lock.json"
-    #   - "site/npm-shrinkwrap.json"
-    #   - "site/pnpm-lock.yaml"
-    #   - "site/yarn.lock"
-    #   - "site/tsconfig.json"
-    #   - "site/tailwind.config.*"
-    #   - "site/postcss.config.*"
-    #   - "site/wrangler.json"
-    #   - "site/wrangler.jsonc"
-    #   - "scripts/astro/**"
-    #   - "scripts/install/node.sh"
-    #   - "scripts/install/_common.sh"
-    #   - ".github/workflows/astro-site-main.yml"
+      - main
+    paths:
+      - "site/src/**"
+      - "site/public/**"
+      - "site/astro.config.*"
+      - "site/package.json"
+      - "site/package-lock.json"
+      - "site/npm-shrinkwrap.json"
+      - "site/pnpm-lock.yaml"
+      - "site/yarn.lock"
+      - "site/tsconfig.json"
+      - "site/tailwind.config.*"
+      - "site/postcss.config.*"
+      - "site/wrangler.json"
+      - "site/wrangler.jsonc"
+      - "scripts/astro/**"
+      - "scripts/install/node.sh"
+      - "scripts/install/_common.sh"
+      - ".github/workflows/astro-site-main.yml"
 
   workflow_dispatch:
     inputs:
@@ -39,7 +38,7 @@ on:
         description: JSON array of publication targets.
         required: true
         type: choice
-        default: '["cloudflare-pages"]'
+        default: '["branch", "cloudflare-pages"]'
         options:
           - "[]"
           - '["cloudflare-pages"]'
@@ -95,10 +94,8 @@ jobs:
       version-file: VERSION
       bump-config: .bumpversion.toml
 
-      # bump-base-branch: main
-      bump-base-branch: feat/astro-pipelines
-      # bump-pr-branch: bump/astro-site-version
-      bump-pr-branch: bump/astro-site-version-test
+      bump-base-branch: main
+      bump-pr-branch: bump/astro-site-version
       bump-commit-marker: "[astro-version-bump]"
 
       ## Keep while testing the central Astro workflows. Set to main after merge.
@@ -141,7 +138,7 @@ jobs:
         ${{
           github.event_name == 'workflow_dispatch' &&
           github.event.inputs.publish-targets ||
-          '["cloudflare-pages"]'
+          '["branch"]'
         }}
 
       create-github-release: >-
