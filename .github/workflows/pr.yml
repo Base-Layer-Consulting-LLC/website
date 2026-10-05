@@ -19,6 +19,7 @@ on:
       - synchronize
       - ready_for_review
     paths:
+      - ".github/workflows/pr.yml"
       - "site/src/**"
       - "site/public/**"
       - "site/astro.config.*"
