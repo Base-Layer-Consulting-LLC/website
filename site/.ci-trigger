@@ -1,0 +1,5 @@
+## Changing anything in this file will trigger the Astro site build/release pipeline,
+#  and will treat the change as a version bump trigger.
+#
+#  You should use 'fix:' commits for this to force a patch bump.
+1
