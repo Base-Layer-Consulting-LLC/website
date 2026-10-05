@@ -44,7 +44,7 @@ permissions:
 jobs:
   build:
     name: Build Astro site
-    uses: redjax/PipelineTemplates/.github/workflows/astro-build.yml@feat/astro-workflows
+    uses: redjax/PipelineTemplates/.github/workflows/astro-build.yml@topic/astro-pipeline
 
     with:
       runner: ubuntu-latest
