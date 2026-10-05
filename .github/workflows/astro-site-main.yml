@@ -87,7 +87,7 @@ permissions:
 jobs:
   site:
     name: Build, release, and publish Astro site
-    uses: redjax/PipelineTemplates/.github/workflows/astro-site-main.yml@feat/astro-workflows
+    uses: redjax/PipelineTemplates/.github/workflows/astro-site-main.yml@topic/astro-pipeline
 
     with:
       versioned: true
